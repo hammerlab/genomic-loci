@@ -1,7 +1,7 @@
 package org.hammerlab.genomics.loci.iterator
 
 import org.hammerlab.genomics.reference.Locus
-import org.hammerlab.magic.iterator.SimpleBufferedIterator
+import org.hammerlab.iterator.SimpleBufferedIterator
 
 /**
  *

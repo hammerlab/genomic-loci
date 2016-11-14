@@ -1,6 +1,6 @@
 package org.hammerlab.genomics.reference
 
-import org.hammerlab.magic.test.spark.SparkSuite
+import org.hammerlab.spark.test.suite.SparkSuite
 
 class ContigIteratorSuite
   extends SparkSuite

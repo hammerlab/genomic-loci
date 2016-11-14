@@ -1,7 +1,7 @@
 package org.hammerlab.genomics.loci.set
 
 import org.hammerlab.genomics.loci.parsing.ParsedLoci
-import org.hammerlab.magic.test.spark.SparkSuite
+import org.hammerlab.spark.test.suite.SparkSuite
 
 class LociSetSuite extends SparkSuite {
 

@@ -1,12 +1,13 @@
 package org.hammerlab.genomics.loci.parsing
 
 import java.io.File
-import scala.collection.JavaConversions._
 
 import htsjdk.variant.vcf.VCFFileReader
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
+import org.hammerlab.genomics.loci.VariantContext
 
+import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
@@ -97,8 +98,9 @@ object LociRanges {
       // VCF-reading currently only works for local files, requires "file://" scheme to not be present.
       // TODO: use hadoop-bam to load VCF from local filesystem or HDFS.
       new VCFFileReader(new File(lociFile), false)
-        .map(variant =>
-          LociRange(variant.getContig, variant.getStart, variant.getEnd)
-        )
+        .map {
+          case VariantContext(contigName, start, end) =>
+            LociRange(contigName, start, end)
+        }
     )
 }

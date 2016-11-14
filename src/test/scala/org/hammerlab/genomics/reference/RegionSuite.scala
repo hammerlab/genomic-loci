@@ -24,7 +24,7 @@ class RegionSuite
 
   test("nonoverlapping reads") {
     val read1 = TestRegion("1", 1, 9)
-    val read2 = TestRegion("2", 10, 18)
+    val read2 = TestRegion("1", 10, 18)
 
     read1.overlaps(read2) should be(false)
     read2.overlaps(read1) should be(false)
@@ -32,7 +32,7 @@ class RegionSuite
 
   test("overlapping reads on start") {
     val read1 = TestRegion("1", 1, 9)
-    val read2 = TestRegion("2", 8, 16)
+    val read2 = TestRegion("1", 8, 16)
 
     read1.overlaps(read2) should be(true)
     read2.overlaps(read1) should be(true)
@@ -40,7 +40,7 @@ class RegionSuite
 
   test("read completely covers another") {
     val read1 = TestRegion("1", 1, 9)
-    val read2 = TestRegion("2", 5, 8)
+    val read2 = TestRegion("1", 5, 8)
 
     read1.overlaps(read2) should be(true)
     read2.overlaps(read1) should be(true)

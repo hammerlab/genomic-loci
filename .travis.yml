@@ -1,0 +1,14 @@
+language: scala
+sudo: false
+
+script: sbt clean coverage test
+
+cache:
+  directories:
+  - .autoconf
+  - /Users/ryan/.m2
+  - /Users/ryan/.ivy2
+  - /Users/ryan/.zinc
+  - target/scala-2.11
+
+after_success: sbt coverageReport coveralls

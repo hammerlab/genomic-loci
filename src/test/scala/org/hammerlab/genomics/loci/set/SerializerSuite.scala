@@ -2,22 +2,17 @@ package org.hammerlab.genomics.loci.set
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
-import com.esotericsoftware.kryo.Kryo
-import org.hammerlab.genomics.util.{GuacFunSuite, KryoTestRegistrar}
+import org.hammerlab.genomics.loci.Suite
 
-class SerializerSuiteRegistrar extends KryoTestRegistrar {
-  override def registerTestClasses(kryo: Kryo): Unit = {
-    // "a closure that includes a LociSet" parallelizes some Range[Long]s.
-    kryo.register(Class.forName("scala.math.Numeric$LongIsIntegral$"))
+class SerializerSuite extends Suite {
 
-    // "make an RDD[LociSet] and an RDD[Contig]" collects some Strings.
-    kryo.register(classOf[Array[String]])
-  }
-}
+  // "a closure that includes a LociSet" parallelizes some Range[Long]s.
+  kryoRegister("scala.math.Numeric$LongIsIntegral$")
 
-class SerializerSuite extends GuacFunSuite {
+  // "make an RDD[LociSet] and an RDD[Contig]" collects some Strings.
+  kryoRegister(classOf[Array[String]])
 
-  override def registrar = classOf[SerializerSuiteRegistrar].getCanonicalName
+  kryoRegister(classOf[scala.collection.mutable.WrappedArray.ofRef[_]])
 
   test("make an RDD[LociSet]") {
 
@@ -30,7 +25,7 @@ class SerializerSuite extends GuacFunSuite {
         "with_dots._and_..underscores11:900-1000",
         "X:5-17,X:19-22,Y:50-60",
         "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120"
-      ).map(LociSet(_))
+      ).map(TestLociSet(_))
 
     val rdd = sc.parallelize(sets)
     val result = rdd.map(_.toString).collect.toSeq
@@ -46,7 +41,7 @@ class SerializerSuite extends GuacFunSuite {
         "21:300-400",
         "X:5-17,X:19-22,Y:50-60",
         "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120"
-      ).map(LociSet(_))
+      ).map(TestLociSet(_))
 
     val rdd = sc.parallelize(sets)
 
@@ -60,7 +55,7 @@ class SerializerSuite extends GuacFunSuite {
   }
 
   test("a closure that includes a LociSet") {
-    val set = LociSet("chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10")
+    val set = TestLociSet("chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10")
     val setBC = sc.broadcast(set)
     val rdd = sc.parallelize(0L until 1000L)
     val result = rdd.filter(i => setBC.value.onContig("chr21").contains(i)).collect
@@ -68,7 +63,7 @@ class SerializerSuite extends GuacFunSuite {
   }
 
   test("java serialization") {
-    val loci = LociSet("chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10")
+    val loci = TestLociSet("chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10")
 
     val baos = new ByteArrayOutputStream()
     val oos = new ObjectOutputStream(baos)
