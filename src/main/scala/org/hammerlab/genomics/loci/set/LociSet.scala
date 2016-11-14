@@ -114,8 +114,8 @@ object LociSet {
    *
    * They operate on an Iterator so that transformations to the data happen in one pass.
    */
-  private[set] def fromContigs(contigs: Iterable[Contig]): LociSet = fromContigs(contigs.iterator)
-  private[set] def fromContigs(contigs: Iterator[Contig]): LociSet =
+  def fromContigs(contigs: Iterable[Contig]): LociSet = fromContigs(contigs.iterator)
+  def fromContigs(contigs: Iterator[Contig]): LociSet =
     LociSet(
       TreeMap(
         contigs
