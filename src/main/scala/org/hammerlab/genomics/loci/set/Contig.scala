@@ -106,7 +106,7 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[JLong]) e
     )
 }
 
-private[loci] object Contig {
+object Contig {
   // Empty-contig constructor, for convenience.
   def apply(name: ContigName): Contig = Contig(name, TreeRangeSet.create[JLong]())
 
