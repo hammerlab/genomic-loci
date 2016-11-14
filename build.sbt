@@ -1,4 +1,4 @@
-name := "loci"
+name := "genomic-loci"
 version := "1.0.0"
 libraryDependencies <++= libraries { v => Seq(
   v('spark),
