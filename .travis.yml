@@ -7,10 +7,7 @@ script: sbt clean coverage test
 
 cache:
   directories:
-  - .autoconf
-  - /Users/ryan/.m2
-  - /Users/ryan/.ivy2
-  - /Users/ryan/.zinc
-  - target/scala-2.11
+  - $HOME/.ivy2/cache
+  - $HOME/.sbt/boot/
 
 after_success: sbt coverageReport coveralls
