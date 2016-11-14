@@ -3,6 +3,7 @@ package org.hammerlab.genomics.kryo
 import com.esotericsoftware.kryo.Kryo
 import org.apache.spark.serializer.KryoRegistrator
 import org.hammerlab.genomics.loci.set.{Contig, ContigSerializer, LociSet, Serializer}
+import org.hammerlab.genomics.reference.Position
 
 class Registrar extends KryoRegistrator {
   override def registerClasses(kryo: Kryo): Unit = {
@@ -12,5 +13,7 @@ class Registrar extends KryoRegistrator {
     kryo.register(classOf[Array[LociSet]])
     kryo.register(classOf[Contig], new ContigSerializer)
     kryo.register(classOf[Array[Contig]])
+
+    Position.registerKryo(kryo)
   }
 }
