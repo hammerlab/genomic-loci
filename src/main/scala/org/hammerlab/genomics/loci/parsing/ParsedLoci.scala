@@ -27,6 +27,8 @@ import scala.io.Source
 sealed trait ParsedLoci extends Any
 
 object ParsedLoci {
+  val empty = apply("")
+
   def apply(lociStrs: String): ParsedLoci = apply(Iterator(lociStrs))
 
   def apply(lines: Iterator[String]): ParsedLoci = {
