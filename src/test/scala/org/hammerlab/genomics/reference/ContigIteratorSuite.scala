@@ -1,5 +1,6 @@
 package org.hammerlab.genomics.reference
 
+import org.hammerlab.genomics.reference.test.{RegionsUtil, TestRegion}
 import org.hammerlab.spark.test.suite.SparkSuite
 
 class ContigIteratorSuite

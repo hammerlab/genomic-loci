@@ -3,7 +3,7 @@ package org.hammerlab.genomics.loci.map
 import java.io.{OutputStream, PrintStream}
 
 import org.hammerlab.genomics.loci.set.{LociSet, Builder => LociSetBuilder}
-import org.hammerlab.genomics.reference.{ContigName, ReferenceRegion}
+import org.hammerlab.genomics.reference.{ContigName, Region}
 import org.hammerlab.strings.TruncatedToString
 
 import scala.collection.immutable.TreeMap
@@ -42,10 +42,10 @@ case class LociMap[T](@transient private val map: SortedMap[ContigName, Contig[T
   }
 
   /**
-   * Return values corresponding to any ranges that overlap the given [[ReferenceRegion]], with a `halfWindowSize`
+   * Return values corresponding to any ranges that overlap the given [[Region]], with a `halfWindowSize`
    * margin of error.
    */
-  def getAll(r: ReferenceRegion, halfWindowSize: Int = 0): Set[T] =
+  def getAll(r: Region, halfWindowSize: Int = 0): Set[T] =
     onContig(r.contigName).getAll(r.start - halfWindowSize, r.end + halfWindowSize)
 
   /**

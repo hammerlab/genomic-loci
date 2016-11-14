@@ -3,7 +3,7 @@ package org.hammerlab.genomics.reference
 case class Slice(contigName: ContigName,
                  start: Locus,
                  bases: Seq[Byte])
-  extends ReferenceRegion {
+  extends Region {
 
   val end: Locus = start + bases.size
 

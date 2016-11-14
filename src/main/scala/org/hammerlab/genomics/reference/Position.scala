@@ -8,7 +8,7 @@ import scala.math.PartiallyOrdered
  * Base trait for classes that logically exist at one genomic locus.
  */
 trait Position
-  extends ReferenceRegion
+  extends Region
     with HasLocus
     with PartiallyOrdered[Position] {
 

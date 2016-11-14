@@ -1,5 +1,5 @@
 name := "genomic-loci"
-version := "1.2.0"
+version := "1.3.0"
 libraryDependencies <++= libraries { v => Seq(
   v('spark),
   "org.hammerlab" %% "iterator" % "1.0.0",
