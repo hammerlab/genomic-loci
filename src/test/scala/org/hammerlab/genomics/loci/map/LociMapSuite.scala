@@ -1,7 +1,8 @@
 package org.hammerlab.genomics.loci.map
 
 import org.hammerlab.genomics.loci.Suite
-import org.hammerlab.genomics.loci.set.{LociSet, TestLociSet}
+import org.hammerlab.genomics.loci.set.LociSet
+import org.hammerlab.genomics.loci.set.test.TestLociSet
 import org.hammerlab.genomics.reference.Interval
 
 class LociMapSuite extends Suite {

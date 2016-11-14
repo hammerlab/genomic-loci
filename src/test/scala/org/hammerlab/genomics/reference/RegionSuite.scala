@@ -1,5 +1,6 @@
 package org.hammerlab.genomics.reference
 
+import org.hammerlab.genomics.reference.test.TestRegion
 import org.scalatest.{FunSuite, Matchers}
 
 class RegionSuite

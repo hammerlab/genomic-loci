@@ -1,4 +1,4 @@
-package org.hammerlab.genomics.reference
+package org.hammerlab.genomics.reference.test
 
 trait RegionsUtil {
   def makeRegions(reads: Seq[(String, Int, Int, Int)]): BufferedIterator[TestRegion] =

@@ -3,7 +3,7 @@ package org.hammerlab.genomics.reference
 /**
  * Trait for objects that are associated with an interval on a genomic contig.
  */
-trait ReferenceRegion
+trait Region
   extends HasContig
     with Interval {
 
@@ -23,15 +23,15 @@ trait ReferenceRegion
    * @param other another region on the genome
    * @return True if the the regions overlap
    */
-  def overlaps(other: ReferenceRegion): Boolean = {
+  def overlaps(other: Region): Boolean = {
     other.contigName == contigName && (overlapsLocus(other.start) || other.overlapsLocus(start))
   }
 
   def regionStr: String = s"$contigName:[$start-$end)"
 }
 
-object ReferenceRegion {
-  implicit def intraContigPartialOrdering[R <: ReferenceRegion] =
+object Region {
+  implicit def intraContigPartialOrdering[R <: Region] =
     new PartialOrdering[R] {
       override def tryCompare(x: R, y: R): Option[Int] = {
         if (x.contigName == y.contigName)
@@ -45,10 +45,10 @@ object ReferenceRegion {
       }
     }
 
-  def apply(contigName: ContigName, start: Locus, end: Locus): ReferenceRegion =
-    ReferenceRegionImpl(contigName, start, end)
+  def apply(contigName: ContigName, start: Locus, end: Locus): Region =
+    RegionImpl(contigName, start, end)
 
-  def unapply(region: ReferenceRegion): Option[(ContigName, Locus, Locus)] =
+  def unapply(region: Region): Option[(ContigName, Locus, Locus)] =
     Some(
       region.contigName,
       region.start,
@@ -56,4 +56,4 @@ object ReferenceRegion {
     )
 }
 
-private case class ReferenceRegionImpl(contigName: ContigName, start: Locus, end: Locus) extends ReferenceRegion
+private case class RegionImpl(contigName: ContigName, start: Locus, end: Locus) extends Region

@@ -2,7 +2,7 @@ package org.hammerlab.genomics.loci.set
 
 import htsjdk.samtools.util.{Interval => HTSJDKInterval}
 import org.hammerlab.genomics.loci.parsing.{All, LociRange, LociRanges, ParsedLoci}
-import org.hammerlab.genomics.reference.{ContigLengths, ContigName, Interval, Locus, NumLoci, ReferenceRegion}
+import org.hammerlab.genomics.reference.{ContigLengths, ContigName, Interval, Locus, NumLoci, Region}
 import org.hammerlab.strings.TruncatedToString
 
 import scala.collection.SortedMap
@@ -36,7 +36,7 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
   /** Build a truncate-able toString() out of underlying contig pieces. */
   def stringPieces: Iterator[String] = contigs.iterator.flatMap(_.stringPieces)
 
-  def intersects(region: ReferenceRegion): Boolean =
+  def intersects(region: Region): Boolean =
     onContig(region.contigName).intersects(region.start, region.end)
 
   /**
