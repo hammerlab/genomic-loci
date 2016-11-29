@@ -1,10 +1,13 @@
 name := "genomic-loci"
-version := "1.4.0"
+version := "1.4.1"
 
-providedDeps ++= Seq(
-  libraries.value('spark),
-  "org.apache.hadoop" % "hadoop-client" % "2.6.0" exclude("javax.servlet", "*")
-)
+providedDeps ++= {
+  val libs = libraries.value
+  Seq(
+    libs('spark),
+    libs('hadoop)
+  )
+}
 
 libraryDependencies ++= Seq(
   "org.hammerlab" %% "iterator" % "1.0.0",
