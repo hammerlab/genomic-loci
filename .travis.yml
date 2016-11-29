@@ -1,9 +1,14 @@
 language: scala
 sudo: false
+
 jdk:
   - oraclejdk8
 
-script: sbt clean coverage test
+scala:
+  - 2.10.6
+  - 2.11.8
+
+script: sbt ++$TRAVIS_SCALA_VERSION clean coverage test
 
 cache:
   directories:
@@ -11,7 +16,7 @@ cache:
   - $HOME/.sbt/boot/
   - $HOME/.zinc
 
-after_success: sbt coverageReport coveralls
+after_success: sbt ++$TRAVIS_SCALA_VERSION coverageReport coveralls
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
