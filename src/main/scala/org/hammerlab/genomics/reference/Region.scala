@@ -6,10 +6,6 @@ package org.hammerlab.genomics.reference
 trait Region
   extends HasContig
     with Interval {
-
-  /** Name of the reference contig. */
-  def contigName: ContigName
-
   /**
    * Does the region overlap the given locus, with halfWindowSize padding?
    */
