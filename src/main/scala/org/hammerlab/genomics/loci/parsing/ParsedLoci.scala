@@ -21,8 +21,15 @@ import scala.io.Source
  *
  * The two implementations are:
  *
- *   - [[All]]: all loci on all contigs.
+ *   - [[All]]: sentinel value representing all loci on all contigs.
  *   - [[LociRanges]]: a sequence of [[LociRange]]s denoting (possibly open-ended) genomic-intervals.
+ *
+ * Examples:
+ *
+ *   - chr1,chrY
+ *   - chr2:0-100
+ *   - chr1:123-124,chr5:456-457
+ *   - all
  */
 sealed trait ParsedLoci extends Any
 
