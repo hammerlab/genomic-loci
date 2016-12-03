@@ -1,5 +1,5 @@
 name := "genomic-loci"
-version := "1.4.2"
+version := "1.4.3"
 
 providedDeps ++= {
   Seq(
@@ -9,13 +9,15 @@ providedDeps ++= {
 }
 
 libraryDependencies ++= Seq(
+  libraries.value('args4j),
+  libraries.value('args4s),
+  libraries.value('bdg_formats),
+  libraries.value('kryo),
   "org.hammerlab" %% "iterator" % "1.0.0",
-  "com.github.samtools" % "htsjdk" % "2.6.1",
-  "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.9.0",
-  "com.esotericsoftware.kryo" % "kryo" % "2.21"
+  "com.github.samtools" % "htsjdk" % "2.6.1"
 )
 
-testDeps += "org.hammerlab" %% "spark-tests" % "1.1.2"
+testDeps += libraries.value('spark_tests)
 
 // Shade Guava due to use of RangeSet classes from 16.0.1 that don't exist in Spark/Hadoop's Guava 11.0.2.
 shadedDeps += "com.google.guava" % "guava" % "16.0.1"
