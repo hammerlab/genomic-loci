@@ -6,6 +6,7 @@ import htsjdk.variant.vcf.VCFFileReader
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.hammerlab.genomics.loci.VariantContext
+import org.hammerlab.genomics.loci.args.LociArgs
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
@@ -59,6 +60,9 @@ object ParsedLoci {
    * (lociFileOpt), and return a [[ParsedLoci]] encapsulating the result. The latter can then be converted into a
    * [[org.hammerlab.genomics.loci.set.LociSet]] when contig-lengths are available / have been parsed from read-sets.
    */
+  def fromArgs(args: LociArgs, hadoopConfiguration: Configuration): Option[ParsedLoci] =
+    fromArgs(args.lociStrOpt, args.lociFileOpt, hadoopConfiguration)
+
   def fromArgs(lociStrOpt: Option[String],
                lociFileOpt: Option[String],
                hadoopConfiguration: Configuration): Option[ParsedLoci] =
