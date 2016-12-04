@@ -1,5 +1,5 @@
 name := "genomic-loci"
-version := "1.4.3"
+version := "1.4.4"
 
 providedDeps ++= {
   Seq(
@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   libraries.value('bdg_formats),
   libraries.value('kryo),
   "org.hammerlab" %% "iterator" % "1.0.0",
+  "org.hammerlab" %% "string-utils" % "1.0.0",
   "com.github.samtools" % "htsjdk" % "2.6.1"
 )
 
