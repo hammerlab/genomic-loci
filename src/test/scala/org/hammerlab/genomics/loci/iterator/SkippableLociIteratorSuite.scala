@@ -1,11 +1,11 @@
 package org.hammerlab.genomics.loci.iterator
 
-import org.hammerlab.genomics.reference.{Interval, IntervalsUtil, Locus}
-import org.scalatest.{FunSuite, Matchers}
+import org.hammerlab.genomics.reference.test.IntervalsUtil
+import org.hammerlab.genomics.reference.{ Interval, Locus }
+import org.hammerlab.test.Suite
 
 class SkippableLociIteratorSuite
-  extends FunSuite
-    with Matchers
+  extends Suite
     with IntervalsUtil {
 
   def strs =

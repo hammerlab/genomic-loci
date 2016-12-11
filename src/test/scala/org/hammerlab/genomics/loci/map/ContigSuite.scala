@@ -1,9 +1,9 @@
 package org.hammerlab.genomics.loci.map
 
-import java.lang.{Long => JLong}
+import java.lang.{ Long ⇒ JLong }
 
-import com.google.common.collect.{ImmutableRangeMap, Range}
-import org.hammerlab.genomics.loci.Suite
+import com.google.common.collect.{ ImmutableRangeMap, Range }
+import org.hammerlab.test.Suite
 
 class ContigSuite extends Suite {
   test("empty") {

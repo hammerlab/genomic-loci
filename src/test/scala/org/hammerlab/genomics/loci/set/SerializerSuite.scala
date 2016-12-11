@@ -2,10 +2,10 @@ package org.hammerlab.genomics.loci.set
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
-import org.hammerlab.genomics.loci.Suite
+import org.hammerlab.genomics.loci.LociSerializerSuite
 import org.hammerlab.genomics.loci.set.test.TestLociSet
 
-class SerializerSuite extends Suite {
+class SerializerSuite extends LociSerializerSuite {
 
   // "a closure that includes a LociSet" parallelizes some Range[Long]s.
   kryoRegister("scala.math.Numeric$LongIsIntegral$")

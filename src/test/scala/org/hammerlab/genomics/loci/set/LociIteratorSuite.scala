@@ -1,10 +1,10 @@
 package org.hammerlab.genomics.loci.set
 
 import org.hammerlab.genomics.loci.iterator.LociIterator
-import org.hammerlab.genomics.reference.TestInterval
-import org.scalatest.{FunSuite, Matchers}
+import org.hammerlab.genomics.reference.test.TestInterval
+import org.hammerlab.test.Suite
 
-class LociIteratorSuite extends FunSuite with Matchers {
+class LociIteratorSuite extends Suite {
 
   def loci(intervals: (Int, Int)*): LociIterator =
     new LociIterator(

@@ -1,12 +1,8 @@
 package org.hammerlab.genomics.loci.map
 
-import org.apache.spark.SparkEnv
-import org.hammerlab.genomics.loci.Suite
+import org.hammerlab.genomics.loci.LociSerializerSuite
 
-class SerializerSuite extends Suite {
-
-  kryoRegister(classOf[Contig[String]], new ContigSerializer[String])
-  kryoRegister(classOf[LociMap[String]], new Serializer[String])
+class SerializerSuite extends LociSerializerSuite {
 
   def testSerde(
     name: String
@@ -18,17 +14,15 @@ class SerializerSuite extends Suite {
     count: Int
   ) = {
     test(name) {
-      val serializer = SparkEnv.get.serializer.newInstance()
-
       val beforeMap = LociMap[String](ranges: _*)
 
       beforeMap.onContig("chr1").asMap.size should be(numRanges)
       beforeMap.onContig("chr1").count should be(count)
 
-      val bytes = serializer.serialize(beforeMap)
+      val bytes = serialize(beforeMap)
       bytes.array.length should be(expectedBytes)
 
-      val afterMap: LociMap[String] = serializer.deserialize[LociMap[String]](bytes)
+      val afterMap: LociMap[String] = deserialize[LociMap[String]](bytes)
 
       beforeMap should be(afterMap)
     }
