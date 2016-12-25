@@ -153,21 +153,21 @@ object LociSet {
           for {
             (contig, length) <- contigLengths
           } yield
-            Region(contig, Locus(0), length)
+            Region(contig, Locus(0), Locus(length))
         case LociRanges(ranges) =>
           for {
             LociRange(contigName, start, endOpt) <- ranges
             contigLengthOpt = contigLengths.get(contigName)
           } yield
             (endOpt, contigLengthOpt) match {
-              case (Some(end), Some(contigLength)) if end > contigLength =>
+              case (Some(end), Some(contigLength)) if end > Locus(contigLength) =>
                 throw new IllegalArgumentException(
                   s"Invalid range $start-${endOpt.get} for contig '$contigName' which has length $contigLength"
                 )
               case (Some(end), _) =>
                 Region(contigName, start, end)
               case (_, Some(contigLength)) =>
-                Region(contigName, start, contigLength)
+                Region(contigName, start, Locus(contigLength))
               case _ =>
                 throw new IllegalArgumentException(
                   s"No such contig: $contigName. Valid contigs: ${contigLengths.keys.mkString(", ")}"
