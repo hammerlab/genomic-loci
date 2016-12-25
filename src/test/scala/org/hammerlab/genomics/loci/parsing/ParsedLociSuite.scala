@@ -22,6 +22,6 @@ class ParsedLociSuite extends Suite {
     val ranges = loci.contigs(0).ranges
     println(s"${ranges.size} ${ranges.map(_.length).sum}")
 
-    loci.count should be(743606)
+    loci.count === 743606
   }
 }

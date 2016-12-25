@@ -1,13 +1,13 @@
 package org.hammerlab.genomics.loci.map
 
-import java.io.{OutputStream, PrintStream}
+import java.io.{ OutputStream, PrintStream }
 
-import org.hammerlab.genomics.loci.set.{LociSet, Builder => LociSetBuilder}
-import org.hammerlab.genomics.reference.{ContigName, Region}
+import org.hammerlab.genomics.loci.set.{ LociSet, Builder ⇒ LociSetBuilder }
+import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci, Region }
 import org.hammerlab.strings.TruncatedToString
 
 import scala.collection.immutable.TreeMap
-import scala.collection.{SortedMap, mutable}
+import scala.collection.{ SortedMap, mutable }
 
 /**
  * An immutable map from loci to a instances of an arbitrary type T.
@@ -25,7 +25,7 @@ case class LociMap[T](@transient private val map: SortedMap[ContigName, Contig[T
   @transient lazy val contigs = map.values.toSeq
 
   /** The number of loci in this LociMap. */
-  @transient lazy val count: Long = contigs.map(_.count).sum
+  @transient lazy val count: NumLoci = contigs.map(_.count).sum
 
   /** The "inverse map", i.e. a T -> LociSet map that gives the loci that map to each value. */
   @transient lazy val inverse: Map[T, LociSet] = {
@@ -46,7 +46,7 @@ case class LociMap[T](@transient private val map: SortedMap[ContigName, Contig[T
    * margin of error.
    */
   def getAll(r: Region, halfWindowSize: Int = 0): Set[T] =
-    onContig(r.contigName).getAll(r.start - halfWindowSize, r.end + halfWindowSize)
+    onContig(r.contigName).getAll(r, halfWindowSize)
 
   /**
    * Returns the loci map on the specified contig.
@@ -54,7 +54,7 @@ case class LociMap[T](@transient private val map: SortedMap[ContigName, Contig[T
    * @param contig The contig name
    * @return A [[Contig]] instance giving the loci mapping on the specified contig.
    */
-  def onContig(contig: String): Contig[T] = map.getOrElse(contig, Contig[T](contig))
+  def onContig(contig: ContigName): Contig[T] = map.getOrElse(contig, Contig[T](contig))
 
   /** Build a truncate-able toString() out of underlying contig pieces. */
   def stringPieces: Iterator[String] = contigs.iterator.flatMap(_.stringPieces)
@@ -78,14 +78,14 @@ object LociMap {
   def apply[T](): LociMap[T] = LociMap(TreeMap[ContigName, Contig[T]]())
 
   /** The following convenience constructors are only called by Builder. */
-  private[map] def apply[T](contigs: (String, Long, Long, T)*): LociMap[T] = {
+  private[map] def apply[T](contigs: (ContigName, Locus, Locus, T)*): LociMap[T] = {
     val builder = new Builder[T]
     for {
       (contig, start, end, value) <- contigs
     } {
       builder.put(contig, start, end, value)
     }
-    builder.result()
+    builder.result
   }
 
   private[map] def fromContigs[T](contigs: Iterable[Contig[T]]): LociMap[T] =

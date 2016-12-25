@@ -8,14 +8,13 @@ import com.esotericsoftware.kryo.{Kryo, Serializer => KryoSerializer}
  */
 class ContigSerializer[T] extends KryoSerializer[Contig[T]] {
   def write(kryo: Kryo, output: Output, obj: Contig[T]) = {
-    output.writeString(obj.name)
+    output.writeString(obj.name.name)
     output.writeLong(obj.asMap.size)
     obj.asMap.foreach {
-      case (range, value) => {
+      case (range, value) =>
         output.writeLong(range.start)
         output.writeLong(range.end)
         kryo.writeClassAndObject(output, value)
-      }
     }
   }
 
@@ -23,12 +22,12 @@ class ContigSerializer[T] extends KryoSerializer[Contig[T]] {
     val builder = LociMap.newBuilder[T]
     val contig = input.readString()
     val count = input.readLong()
-    (0L until count).foreach(_ => {
+    (0L until count).foreach { _ =>
       val start = input.readLong()
       val end = input.readLong()
       val value: T = kryo.readClassAndObject(input).asInstanceOf[T]
       builder.put(contig, start, end, value)
-    })
+    }
     builder.result.onContig(contig)
   }
 }

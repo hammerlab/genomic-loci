@@ -9,9 +9,9 @@ class LociMapSuite extends Suite {
   test("properties of empty LociMap") {
     val emptyMap = LociMap[String]()
 
-    emptyMap.count should be(0)
-    emptyMap.toString() should be("")
-    emptyMap should equal(LociMap[String]())
+    emptyMap.count === 0
+    emptyMap.toString() === ""
+    emptyMap === LociMap[String]()
   }
 
   test("basic map operations") {
@@ -20,9 +20,9 @@ class LociMapSuite extends Suite {
       ("chr20", 200L, 201L, "B")
     )
 
-    lociMap.count should be(101)
-    lociMap.toString should be("chr1:100-200=A,chr20:200-201=B")
-    lociMap.contigs.map(_.name) should be(Seq("chr1", "chr20"))
+    lociMap.count === 101
+    lociMap.toString === "chr1:100-200=A,chr20:200-201=B"
+    lociMap.contigs.map(_.name) === Seq("chr1", "chr20")
 
     lociMap should not equal LociMap[String]()
 
@@ -33,8 +33,8 @@ class LociMapSuite extends Suite {
       )
     )
 
-    lociMap.onContig("chr1").toString should equal("chr1:100-200=A")
-    lociMap.onContig("chr20").toString should equal("chr20:200-201=B")
+    lociMap.onContig("chr1").toString === "chr1:100-200=A"
+    lociMap.onContig("chr20").toString === "chr20:200-201=B"
   }
 
   test("asInverseMap with repeated values") {
@@ -52,8 +52,8 @@ class LociMapSuite extends Suite {
       )
     )
 
-    lociMap.count should be(300)
-    lociMap.toString should be("chr1:100-200=A,chr2:200-300=A,chr3:400-500=B")
+    lociMap.count === 300
+    lociMap.toString === "chr1:100-200=A,chr2:200-300=A,chr3:400-500=B"
   }
 
   test("range coalescing") {
@@ -64,7 +64,7 @@ class LociMapSuite extends Suite {
       ("chr1", 180L, 240L, "A")
     )
 
-    lociMap.inverse should be(
+    lociMap.inverse === (
       Map(
         "A" -> TestLociSet("chr1:100-150,chr1:160-240"),
         "B" -> TestLociSet("chr1:400-500"),
@@ -72,8 +72,8 @@ class LociMapSuite extends Suite {
       )
     )
 
-    lociMap.count should be(240)
-    lociMap.toString should be("chr1:100-150=A,chr1:150-160=C,chr1:160-240=A,chr1:400-500=B")
+    lociMap.count === 240
+    lociMap.toString === "chr1:100-150=A,chr1:150-160=C,chr1:160-240=A,chr1:400-500=B"
   }
 
   test("spanning equal values merges") {
@@ -84,21 +84,19 @@ class LociMapSuite extends Suite {
       ("chr1", 199L, 301L, "A")
     )
 
-    map.inverse should be(
+    map.inverse ===
       Map(
         "A" -> TestLociSet("chr1:100-400"),
         "B" -> TestLociSet("chr1:400-500")
       )
-    )
 
-    map.onContig("chr1").asMap should be(
+    map.onContig("chr1").asMap ===
       Map(
         Interval(100, 400) -> "A",
         Interval(400, 500) -> "B"
       )
-    )
 
-    map.count should be(400)
+    map.count === 400
   }
 
   test("bridging equal values merges") {
@@ -109,20 +107,20 @@ class LociMapSuite extends Suite {
       ("chr1", 200L, 300L, "A")
     )
 
-    map.inverse should be(
+    map.inverse === (
       Map(
         "A" -> TestLociSet("chr1:100-400"),
         "B" -> TestLociSet("chr1:400-500")
       )
     )
 
-    map.onContig("chr1").asMap should be(
+    map.onContig("chr1").asMap === (
       Map(
         Interval(100, 400) -> "A",
         Interval(400, 500) -> "B"
       )
     )
 
-    map.count should be(400)
+    map.count === 400
   }
 }

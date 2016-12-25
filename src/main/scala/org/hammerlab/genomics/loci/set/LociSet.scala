@@ -25,7 +25,7 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
   @transient lazy val contigs = map.values.toArray
 
   /** The number of loci in this LociSet. */
-  @transient lazy val count: NumLoci = contigs.map(_.count).sum
+  @transient lazy val count: NumLoci = contigs.map(_.count: Long).sum
 
   def isEmpty = map.isEmpty
   def nonEmpty = map.nonEmpty
@@ -49,7 +49,7 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
     assume(numToTake <= count, s"Can't take $numToTake loci from a set of size $count.")
 
     // Optimize for taking none or all:
-    if (numToTake == 0) {
+    if (numToTake == NumLoci(0)) {
       (LociSet(), this)
     } else if (numToTake == count) {
       (this, LociSet())
@@ -91,13 +91,20 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
     map
       .keys
       .flatMap(
-        contig => {
-          this.onContig(contig)
+        contig =>
+          onContig(contig)
             .ranges
             // We add 1 to the start to move to 1-based coordinates
             // Since the `Interval` end is inclusive, we are adding and subtracting 1, no-op
-            .map(interval => new HTSJDKInterval(contig, interval.start.toInt + 1, interval.end.toInt))
-        }).toList
+            .map(interval =>
+              new HTSJDKInterval(
+                contig.name,
+                interval.start.toInt + 1,
+                interval.end.toInt
+              )
+          )
+      )
+      .toList
 }
 
 object LociSet {
@@ -125,15 +132,15 @@ object LociSet {
       )
     )
 
-  def apply(regions: Iterable[(ContigName, Locus, Locus)]): LociSet =
+  def apply(regions: Iterable[Region]): LociSet =
     LociSet.fromContigs(
       (for {
-        (contigName, start, end) <- regions
+        Region(contigName, start, end) <- regions
         if start != end
         range = Interval(start, end)
-      } yield {
+      } yield
         contigName -> range
-      })
+      )
       .groupBy(_._1)
       .mapValues(_.map(_._2))
       .map(Contig(_))
@@ -146,7 +153,7 @@ object LociSet {
           for {
             (contig, length) <- contigLengths
           } yield
-            (contig, 0L, length)
+            Region(contig, Locus(0), length)
         case LociRanges(ranges) =>
           for {
             LociRange(contigName, start, endOpt) <- ranges
@@ -158,9 +165,9 @@ object LociSet {
                   s"Invalid range $start-${endOpt.get} for contig '$contigName' which has length $contigLength"
                 )
               case (Some(end), _) =>
-                (contigName, start, end)
+                Region(contigName, start, end)
               case (_, Some(contigLength)) =>
-                (contigName, start, contigLength)
+                Region(contigName, start, contigLength)
               case _ =>
                 throw new IllegalArgumentException(
                   s"No such contig: $contigName. Valid contigs: ${contigLengths.keys.mkString(", ")}"

@@ -1,30 +1,33 @@
 package org.hammerlab.genomics.loci.map
 
-import org.hammerlab.genomics.loci.LociSerializerSuite
+import org.hammerlab.genomics.reference.{ ContigName, Locus }
+import org.hammerlab.spark.test.suite.{ KryoSerializerSuite, SparkSerializerSuite }
 
-class SerializerSuite extends LociSerializerSuite {
+class SerializerSuite
+  extends KryoSerializerSuite(classOf[Registrar])
+  with SparkSerializerSuite {
 
   def testSerde(
     name: String
   )(
-    ranges: (String, Long, Long, String)*
+    ranges: (ContigName, Locus, Locus, String)*
   )(
     expectedBytes: Int,
     numRanges: Int,
     count: Int
   ) = {
     test(name) {
-      val beforeMap = LociMap[String](ranges: _*)
+      val beforeMap = LociMap(ranges: _*)
 
-      beforeMap.onContig("chr1").asMap.size should be(numRanges)
-      beforeMap.onContig("chr1").count should be(count)
+      beforeMap.onContig("chr1").asMap.size === numRanges
+      beforeMap.onContig("chr1").count === count
 
       val bytes = serialize(beforeMap)
-      bytes.array.length should be(expectedBytes)
+      bytes.array.length === expectedBytes
 
       val afterMap: LociMap[String] = deserialize[LociMap[String]](bytes)
 
-      beforeMap should be(afterMap)
+      beforeMap === afterMap
     }
   }
 
@@ -32,23 +35,31 @@ class SerializerSuite extends LociSerializerSuite {
 
   testSerde("1")(
     ("chr1", 100L, 200L, "A")
-  )(43, 1, 100)
+  )(
+    43, 1, 100
+  )
 
   testSerde("2")(
     ("chr1", 100L, 200L, "A"),
     ("chr1", 400L, 500L, "B")
-  )(63, 2, 200)
+  )(
+    63, 2, 200
+  )
 
   testSerde("3")(
     ("chr1", 100L, 200L, "A"),
     ("chr1", 400L, 500L, "B"),
     ("chr1", 600L, 700L, "C")
-  )(83, 3, 300)
+  )(
+    83, 3, 300
+  )
 
   testSerde("4")(
     ("chr1", 100L, 200L, "A"),
     ("chr1", 400L, 500L, "B"),
     ("chr1", 600L, 700L, "C"),
     ("chr1", 700L, 800L, "A")
-  )(101, 4, 400)
+  )(
+    101, 4, 400
+  )
 }

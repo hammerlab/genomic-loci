@@ -3,6 +3,7 @@ package org.hammerlab.genomics.loci.set
 import org.hammerlab.genomics.loci.iterator.LociIterator
 import org.hammerlab.genomics.reference.test.TestInterval
 import org.hammerlab.test.Suite
+import org.hammerlab.genomics.reference.test.LocusUtil._
 
 class LociIteratorSuite extends Suite {
 
@@ -16,17 +17,17 @@ class LociIteratorSuite extends Suite {
     )
 
   test("simple") {
-    loci(100 -> 110).toList should be(100 until 110)
+    loci(100 -> 110).toList === (100 until 110)
   }
 
   test("skipTo") {
     val it = loci(100 -> 110)
     it.skipTo(103)
-    it.head should be(103)
-    it.toList should be(103 until 110)
+    it.head === 103
+    it.toList === (103 until 110)
   }
 
   test("intervals") {
-    loci(100 -> 110, 120 -> 130).toList should be((100 until 110) ++ (120 until 130))
+    loci(100 -> 110, 120 -> 130).toList === ((100 until 110) ++ (120 until 130))
   }
 }
