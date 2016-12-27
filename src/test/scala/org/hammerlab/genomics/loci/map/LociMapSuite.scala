@@ -2,9 +2,12 @@ package org.hammerlab.genomics.loci.map
 
 import org.hammerlab.genomics.loci.set.test.TestLociSet
 import org.hammerlab.genomics.reference.Interval
+import org.hammerlab.genomics.reference.test.LocusUtil
 import org.hammerlab.test.Suite
 
-class LociMapSuite extends Suite {
+class LociMapSuite
+  extends Suite
+    with LocusUtil {
 
   test("properties of empty LociMap") {
     val emptyMap = LociMap[String]()
@@ -16,8 +19,8 @@ class LociMapSuite extends Suite {
 
   test("basic map operations") {
     val lociMap = LociMap(
-      ("chr1",  100L, 200L, "A"),
-      ("chr20", 200L, 201L, "B")
+      ("chr1",  100, 200, "A"),
+      ("chr20", 200, 201, "B")
     )
 
     lociMap.count === 101
@@ -39,9 +42,9 @@ class LociMapSuite extends Suite {
 
   test("asInverseMap with repeated values") {
     val lociMap = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr2", 200L, 300L, "A"),
-      ("chr3", 400L, 500L, "B")
+      ("chr1", 100, 200, "A"),
+      ("chr2", 200, 300, "A"),
+      ("chr3", 400, 500, "B")
     )
 
     // asInverseMap stuffs all Loci with the same value into a LociSet.
@@ -58,19 +61,18 @@ class LociMapSuite extends Suite {
 
   test("range coalescing") {
     val lociMap = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr1", 400L, 500L, "B"),
-      ("chr1", 150L, 160L, "C"),
-      ("chr1", 180L, 240L, "A")
+      ("chr1", 100, 200, "A"),
+      ("chr1", 400, 500, "B"),
+      ("chr1", 150, 160, "C"),
+      ("chr1", 180, 240, "A")
     )
 
-    lociMap.inverse === (
+    lociMap.inverse ===
       Map(
         "A" -> TestLociSet("chr1:100-150,chr1:160-240"),
         "B" -> TestLociSet("chr1:400-500"),
         "C" -> TestLociSet("chr1:150-160")
       )
-    )
 
     lociMap.count === 240
     lociMap.toString === "chr1:100-150=A,chr1:150-160=C,chr1:160-240=A,chr1:400-500=B"
@@ -78,10 +80,10 @@ class LociMapSuite extends Suite {
 
   test("spanning equal values merges") {
     val map = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr1", 400L, 500L, "B"),
-      ("chr1", 300L, 400L, "A"),
-      ("chr1", 199L, 301L, "A")
+      ("chr1", 100, 200, "A"),
+      ("chr1", 400, 500, "B"),
+      ("chr1", 300, 400, "A"),
+      ("chr1", 199, 301, "A")
     )
 
     map.inverse ===
@@ -101,25 +103,23 @@ class LociMapSuite extends Suite {
 
   test("bridging equal values merges") {
     val map = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr1", 400L, 500L, "B"),
-      ("chr1", 300L, 400L, "A"),
-      ("chr1", 200L, 300L, "A")
+      ("chr1", 100, 200, "A"),
+      ("chr1", 400, 500, "B"),
+      ("chr1", 300, 400, "A"),
+      ("chr1", 200, 300, "A")
     )
 
-    map.inverse === (
+    map.inverse ===
       Map(
         "A" -> TestLociSet("chr1:100-400"),
         "B" -> TestLociSet("chr1:400-500")
       )
-    )
 
-    map.onContig("chr1").asMap === (
+    map.onContig("chr1").asMap ===
       Map(
         Interval(100, 400) -> "A",
         Interval(400, 500) -> "B"
       )
-    )
 
     map.count === 400
   }

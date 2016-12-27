@@ -13,8 +13,8 @@ class ContigSerializer extends KryoSerializer[Contig] {
     for {
       Interval(start, end) <- obj.ranges
     } {
-      output.writeLong(start)
-      output.writeLong(end)
+      output.writeLong(start.locus)
+      output.writeLong(end.locus)
     }
   }
 

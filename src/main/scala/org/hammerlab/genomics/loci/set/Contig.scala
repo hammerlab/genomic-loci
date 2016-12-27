@@ -37,8 +37,8 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[Locus]) e
     for {
       Interval(start, end) <- ranges
     } {
-      out.writeLong(start)
-      out.writeLong(end)
+      out.writeLong(start.locus)
+      out.writeLong(end.locus)
     }
   }
 
@@ -67,7 +67,7 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[Locus]) e
   def count: NumLoci = ranges.map(_.length: Long).sum
 
   /** Returns whether a given genomic region overlaps with any loci on this contig. */
-  def intersects(start: Long, end: Long): Boolean = !rangeSet.subRangeSet(lociRange(start, end)).isEmpty
+  def intersects(start: Locus, end: Locus): Boolean = !rangeSet.subRangeSet(lociRange(start, end)).isEmpty
 
   /**
    * Make two new Contigs: one with the first @numToTake loci from this Contig, and the second with the rest.

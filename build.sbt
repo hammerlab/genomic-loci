@@ -3,7 +3,6 @@ organization := "org.hammerlab.genomics"
 name := "loci"
 version := "1.5.0-SNAPSHOT"
 
-scala211Only
 addSparkDeps
 
 deps ++= Seq(

@@ -99,8 +99,8 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
             .map(interval =>
               new HTSJDKInterval(
                 contig.name,
-                interval.start.toInt + 1,
-                interval.end.toInt
+                interval.start.locus.toInt + 1,
+                interval.end.locus.toInt
               )
           )
       )
