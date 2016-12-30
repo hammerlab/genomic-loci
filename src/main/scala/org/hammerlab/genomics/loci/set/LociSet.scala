@@ -4,6 +4,7 @@ import htsjdk.samtools.util.{Interval => HTSJDKInterval}
 import org.hammerlab.genomics.loci.parsing.{All, LociRange, LociRanges, ParsedLoci}
 import org.hammerlab.genomics.reference.{ContigLengths, ContigName, Interval, Locus, NumLoci, Region}
 import org.hammerlab.strings.TruncatedToString
+import org.scalautils.ConversionCheckedTripleEquals._
 
 import scala.collection.SortedMap
 import scala.collection.immutable.TreeMap
@@ -77,8 +78,8 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
       }
 
       val (firstSet, secondSet) = (first.result, second.result)
-      assert(firstSet.count == numToTake)
-      assert(firstSet.count + secondSet.count == count)
+      assert(firstSet.count === numToTake)
+      assert(firstSet.count + secondSet.count === count)
       (firstSet, secondSet)
     }
   }
