@@ -4,6 +4,7 @@ import java.io.{ ObjectInputStream, ObjectOutputStream }
 
 import com.google.common.collect.{ RangeSet, TreeRangeSet, Range ⇒ JRange }
 import org.hammerlab.genomics.loci.iterator.LociIterator
+import org.hammerlab.genomics.reference.Interval.orderByStart
 import org.hammerlab.genomics.reference.{ ContigName, Interval, Locus, NumLoci, Region }
 import org.hammerlab.strings.TruncatedToString
 
@@ -51,7 +52,7 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[Locus]) e
       .asRanges()
       .map(range => Interval(range.lowerEndpoint(), range.upperEndpoint()))
       .toVector
-      .sortBy(x => x)
+      .sorted(orderByStart)
 
   def regions: Iterator[Region] = ranges.iterator.map(range ⇒ Region(name, range))
 

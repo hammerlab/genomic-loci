@@ -4,6 +4,7 @@ import com.google.common.collect.{ RangeMap, TreeRangeMap, Range ⇒ JRange }
 import org.hammerlab.genomics.loci.set.{ Contig ⇒ LociSetContig }
 import org.hammerlab.genomics.reference.{ ContigName, Interval, Locus, NumLoci, Region }
 import org.hammerlab.strings.TruncatedToString
+import org.hammerlab.genomics.reference.Interval.orderByStart
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.{ SortedMap, TreeMap }
@@ -49,7 +50,7 @@ case class Contig[T](name: ContigName, private val rangeMap: RangeMap[Locus, T])
       } yield
         Interval(range.lowerEndpoint(), range.upperEndpoint()) -> value
       ): _*
-    )
+    )(orderByStart)
 
   def asRegionsMap: Iterator[(Region, T)] =
     for {
