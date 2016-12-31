@@ -55,7 +55,7 @@ class ContigSuite extends Suite {
         ("chrM", 8286, 16571, 1)
       )
 
-    lociMap.onContig("chrM").getAll(5, 10) should ===(Set(0))
-    lociMap.onContig("chrM").getAll(10000, 11000) should ===(Set(1))
+    lociMap("chrM").getAll(5, 10) should ===(Set(0))
+    lociMap("chrM").getAll(10000, 11000) should ===(Set(1))
   }
 }

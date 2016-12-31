@@ -1,6 +1,7 @@
 package org.hammerlab.genomics.loci.map
 
-import org.hammerlab.genomics.loci.set.test.TestLociSet
+import org.hammerlab.genomics.loci.set.LociSet
+import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.test.{ ContigNameUtil, LocusUtil }
 import org.hammerlab.genomics.reference.{ ContigName, Interval }
 import org.hammerlab.test.Suite
@@ -8,7 +9,8 @@ import org.hammerlab.test.Suite
 class LociMapSuite
   extends Suite
     with LocusUtil
-    with ContigNameUtil {
+    with ContigNameUtil
+    with LociSetUtil {
 
   test("properties of empty LociMap") {
     val emptyMap = LociMap[String]()
@@ -30,15 +32,15 @@ class LociMapSuite
 
     lociMap should not equal LociMap[String]()
 
-    lociMap.inverse should equal(
+    lociMap.inverse should ===(
       Map(
-        "A" -> TestLociSet("chr1:100-200"),
-        "B" -> TestLociSet("chr20:200-201")
+        "A" → lociSet("chr1:100-200"),
+        "B" → lociSet("chr20:200-201")
       )
     )
 
-    lociMap.onContig("chr1").toString should ===("chr1:100-200=A")
-    lociMap.onContig("chr20").toString should ===("chr20:200-201=B")
+    lociMap("chr1").toString should ===("chr1:100-200=A")
+    lociMap("chr20").toString should ===("chr20:200-201=B")
   }
 
   test("asInverseMap with repeated values") {
@@ -51,8 +53,8 @@ class LociMapSuite
     // asInverseMap stuffs all Loci with the same value into a LociSet.
     lociMap.inverse should equal(
       Map(
-        "A" -> TestLociSet("chr1:100-200,chr2:200-300"),
-        "B" -> TestLociSet("chr3:400-500")
+        "A" -> lociSet("chr1:100-200,chr2:200-300"),
+        "B" -> lociSet("chr3:400-500")
       )
     )
 
@@ -70,9 +72,9 @@ class LociMapSuite
 
     lociMap.inverse ===
       Map(
-        "A" -> TestLociSet("chr1:100-150,chr1:160-240"),
-        "B" -> TestLociSet("chr1:400-500"),
-        "C" -> TestLociSet("chr1:150-160")
+        "A" -> lociSet("chr1:100-150,chr1:160-240"),
+        "B" -> lociSet("chr1:400-500"),
+        "C" -> lociSet("chr1:150-160")
       )
 
     lociMap.count should ===(240)
@@ -89,11 +91,11 @@ class LociMapSuite
 
     map.inverse ===
       Map(
-        "A" -> TestLociSet("chr1:100-400"),
-        "B" -> TestLociSet("chr1:400-500")
+        "A" -> lociSet("chr1:100-400"),
+        "B" -> lociSet("chr1:400-500")
       )
 
-    map.onContig("chr1").asMap ===
+    map("chr1").asMap ===
       Map(
         Interval(100, 400) -> "A",
         Interval(400, 500) -> "B"
@@ -112,11 +114,11 @@ class LociMapSuite
 
     map.inverse ===
       Map(
-        "A" -> TestLociSet("chr1:100-400"),
-        "B" -> TestLociSet("chr1:400-500")
+        "A" -> lociSet("chr1:100-400"),
+        "B" -> lociSet("chr1:400-500")
       )
 
-    map.onContig("chr1").asMap ===
+    map("chr1").asMap ===
       Map(
         Interval(100, 400) -> "A",
         Interval(400, 500) -> "B"

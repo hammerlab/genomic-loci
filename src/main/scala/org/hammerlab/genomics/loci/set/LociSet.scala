@@ -32,13 +32,13 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
   def nonEmpty = map.nonEmpty
 
   /** Given a contig name, returns a [[Contig]] giving the loci on that contig. */
-  def onContig(name: ContigName): Contig = map.getOrElse(name, Contig(name))
+  def apply(contigName: ContigName): Contig = map.getOrElse(contigName, Contig(contigName))
 
   /** Build a truncate-able toString() out of underlying contig pieces. */
   def stringPieces: Iterator[String] = contigs.iterator.flatMap(_.stringPieces)
 
   def intersects(region: Region): Boolean =
-    onContig(region.contigName).intersects(region.start, region.end)
+    apply(region.contigName).intersects(region.start, region.end)
 
   /**
    * Split the LociSet into two sets, where the first one has `numToTake` loci, and the second one has the
@@ -93,7 +93,7 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
       .keys
       .flatMap(
         contig =>
-          onContig(contig)
+          apply(contig)
             .ranges
             // We add 1 to the start to move to 1-based coordinates
             // Since the `Interval` end is inclusive, we are adding and subtracting 1, no-op

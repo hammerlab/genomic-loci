@@ -8,7 +8,11 @@ import org.hammerlab.genomics.reference.ContigLengths
  * Convenience wrapper for creating dummy LociSets in tests; we could publish this separately from the main JAR, but
  * it's just one tiny class for now so we leave it bundled.
  */
-object TestLociSet {
-  def apply(parsedLoci: ParsedLoci): LociSet = LociSet(parsedLoci, ContigLengths.empty)
-  def apply(lociStr: String): LociSet = apply(ParsedLoci(lociStr))
+trait LociSetUtil {
+  implicit def lociSetFromParsedLoci(parsedLoci: ParsedLoci): LociSet = LociSet(parsedLoci, ContigLengths.empty)
+  implicit def lociSetFromString(lociStr: String): LociSet = ParsedLoci(lociStr)
+  def lociSet(lociStr: String): LociSet = lociStr
+  def lociSet(parsedLoci: ParsedLoci): LociSet = parsedLoci
 }
+
+object LociSetUtil extends LociSetUtil

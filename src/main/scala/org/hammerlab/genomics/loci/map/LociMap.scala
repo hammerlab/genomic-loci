@@ -46,7 +46,7 @@ case class LociMap[T](@transient private val map: SortedMap[ContigName, Contig[T
    * margin of error.
    */
   def getAll(r: Region, halfWindowSize: Int = 0): Set[T] =
-    onContig(r.contigName).getAll(r, halfWindowSize)
+    apply(r.contigName).getAll(r, halfWindowSize)
 
   /**
    * Returns the loci map on the specified contig.
@@ -54,7 +54,7 @@ case class LociMap[T](@transient private val map: SortedMap[ContigName, Contig[T
    * @param contig The contig name
    * @return A [[Contig]] instance giving the loci mapping on the specified contig.
    */
-  def onContig(contig: ContigName): Contig[T] = map.getOrElse(contig, Contig[T](contig))
+  def apply(contig: ContigName): Contig[T] = map.getOrElse(contig, Contig[T](contig))
 
   /** Build a truncate-able toString() out of underlying contig pieces. */
   def stringPieces: Iterator[String] = contigs.iterator.flatMap(_.stringPieces)

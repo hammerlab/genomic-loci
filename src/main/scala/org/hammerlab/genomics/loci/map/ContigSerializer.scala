@@ -29,7 +29,7 @@ class ContigSerializer[T] extends KryoSerializer[Contig[T]] {
       val value: T = kryo.readClassAndObject(input).asInstanceOf[T]
       builder.put(contig, Locus(start), Locus(end), value)
     }
-    builder.result.onContig(contig)
+    builder.result(contig)
   }
 }
 
