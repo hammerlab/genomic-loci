@@ -7,7 +7,7 @@ abstract class SkippableLociIterator[T] extends SimpleBufferedIterator[T] {
 
   def locusFn: T => Locus
 
-  var locus: Locus = 0
+  var locus = Locus(0)
 
   override def postNext(): Unit = {
     locus = locus.next

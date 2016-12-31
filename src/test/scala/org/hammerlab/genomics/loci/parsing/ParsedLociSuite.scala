@@ -2,9 +2,12 @@ package org.hammerlab.genomics.loci.parsing
 
 import org.apache.hadoop.conf.Configuration
 import org.hammerlab.genomics.loci.set.test.TestLociSet
+import org.hammerlab.genomics.reference.test.LocusUtil
 import org.hammerlab.test.Suite
 
-class ParsedLociSuite extends Suite {
+class ParsedLociSuite
+  extends Suite
+    with LocusUtil {
 
   val conf = new Configuration
 
@@ -19,9 +22,6 @@ class ParsedLociSuite extends Suite {
         ).get
       )
 
-    val ranges = loci.contigs(0).ranges
-    println(s"${ranges.size} ${ranges.map(_.length).sum}")
-
-    loci.count === 743606
+    loci.count should ===(743606)
   }
 }

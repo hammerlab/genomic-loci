@@ -9,10 +9,10 @@ class ContigSuite extends Suite {
   test("empty") {
     val contigMap = new Contig("chr1", ImmutableRangeMap.builder[Locus, String]().build())
 
-    contigMap.get(100) === None
-    contigMap.getAll(0, 10000) === Set()
-    contigMap.count === 0
-    contigMap.toString === ""
+    contigMap.get(100) should ===(None)
+    contigMap.getAll(0, 10000) should be(Set())
+    contigMap.count should ===(0)
+    contigMap.toString should ===("")
   }
 
   test("basic operations") {
@@ -30,22 +30,22 @@ class ContigSuite extends Suite {
           .build()
       )
 
-    contigMap.get(99) === None
-    contigMap.get(100) === Some("A")
-    contigMap.get(199) === Some("A")
-    contigMap.get(200) === Some("B")
-    contigMap.get(299) === Some("B")
-    contigMap.get(300) === None
+    contigMap.get(99) should be(None)
+    contigMap.get(100) should ===(Some("A"))
+    contigMap.get(199) should ===(Some("A"))
+    contigMap.get(200) should ===(Some("B"))
+    contigMap.get(299) should ===(Some("B"))
+    contigMap.get(300) should be(None)
 
-    contigMap.getAll(0, 100) === Set()
-    contigMap.getAll(0, 101) === Set("A")
-    contigMap.getAll(199, 200) === Set("A")
-    contigMap.getAll(199, 201) === Set("A", "B")
-    contigMap.getAll(200, 201) === Set("B")
-    contigMap.getAll(0, 10000) === Set("A", "B")
+    contigMap.getAll(0, 100) should be(Set())
+    contigMap.getAll(0, 101) should ===(Set("A"))
+    contigMap.getAll(199, 200) should ===(Set("A"))
+    contigMap.getAll(199, 201) should ===(Set("A", "B"))
+    contigMap.getAll(200, 201) should ===(Set("B"))
+    contigMap.getAll(0, 10000) should ===(Set("A", "B"))
 
-    contigMap.count === 200
-    contigMap.toString === "chr1:100-200=A,chr1:200-300=B"
+    contigMap.count should ===(200)
+    contigMap.toString should ===("chr1:100-200=A,chr1:200-300=B")
   }
 
   test("getAll") {
@@ -55,7 +55,7 @@ class ContigSuite extends Suite {
         ("chrM", 8286, 16571, 1)
       )
 
-    lociMap.onContig("chrM").getAll(5, 10) === Set[Long](0)
-    lociMap.onContig("chrM").getAll(10000, 11000) === Set[Long](1)
+    lociMap.onContig("chrM").getAll(5, 10) should ===(Set(0))
+    lociMap.onContig("chrM").getAll(10000, 11000) should ===(Set(1))
   }
 }

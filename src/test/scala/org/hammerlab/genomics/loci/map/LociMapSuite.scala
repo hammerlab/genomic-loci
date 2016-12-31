@@ -1,20 +1,21 @@
 package org.hammerlab.genomics.loci.map
 
 import org.hammerlab.genomics.loci.set.test.TestLociSet
-import org.hammerlab.genomics.reference.Interval
-import org.hammerlab.genomics.reference.test.LocusUtil
+import org.hammerlab.genomics.reference.test.{ ContigNameUtil, LocusUtil }
+import org.hammerlab.genomics.reference.{ ContigName, Interval }
 import org.hammerlab.test.Suite
 
 class LociMapSuite
   extends Suite
-    with LocusUtil {
+    with LocusUtil
+    with ContigNameUtil {
 
   test("properties of empty LociMap") {
     val emptyMap = LociMap[String]()
 
-    emptyMap.count === 0
-    emptyMap.toString() === ""
-    emptyMap === LociMap[String]()
+    emptyMap.count should ===(0)
+    emptyMap.toString() should ===("")
+    emptyMap should ===(LociMap[String]())
   }
 
   test("basic map operations") {
@@ -23,9 +24,9 @@ class LociMapSuite
       ("chr20", 200, 201, "B")
     )
 
-    lociMap.count === 101
-    lociMap.toString === "chr1:100-200=A,chr20:200-201=B"
-    lociMap.contigs.map(_.name) === Seq("chr1", "chr20")
+    lociMap.count should ===(101)
+    lociMap.toString should ===("chr1:100-200=A,chr20:200-201=B")
+    lociMap.contigs.map(_.name) should ===(Seq("chr1", "chr20"))
 
     lociMap should not equal LociMap[String]()
 
@@ -36,8 +37,8 @@ class LociMapSuite
       )
     )
 
-    lociMap.onContig("chr1").toString === "chr1:100-200=A"
-    lociMap.onContig("chr20").toString === "chr20:200-201=B"
+    lociMap.onContig("chr1").toString should ===("chr1:100-200=A")
+    lociMap.onContig("chr20").toString should ===("chr20:200-201=B")
   }
 
   test("asInverseMap with repeated values") {
@@ -55,8 +56,8 @@ class LociMapSuite
       )
     )
 
-    lociMap.count === 300
-    lociMap.toString === "chr1:100-200=A,chr2:200-300=A,chr3:400-500=B"
+    lociMap.count should ===(300)
+    lociMap.toString should ===("chr1:100-200=A,chr2:200-300=A,chr3:400-500=B")
   }
 
   test("range coalescing") {
@@ -74,8 +75,8 @@ class LociMapSuite
         "C" -> TestLociSet("chr1:150-160")
       )
 
-    lociMap.count === 240
-    lociMap.toString === "chr1:100-150=A,chr1:150-160=C,chr1:160-240=A,chr1:400-500=B"
+    lociMap.count should ===(240)
+    lociMap.toString should ===("chr1:100-150=A,chr1:150-160=C,chr1:160-240=A,chr1:400-500=B")
   }
 
   test("spanning equal values merges") {
@@ -98,7 +99,7 @@ class LociMapSuite
         Interval(400, 500) -> "B"
       )
 
-    map.count === 400
+    map.count should ===(400)
   }
 
   test("bridging equal values merges") {
@@ -121,6 +122,6 @@ class LociMapSuite
         Interval(400, 500) -> "B"
       )
 
-    map.count === 400
+    map.count should ===(400)
   }
 }
