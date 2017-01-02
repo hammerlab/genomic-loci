@@ -25,3 +25,5 @@ shadeRenames += "com.google.thirdparty.**" -> "org.hammerlab.guava.@1"
 
 // Publish JAR that includes shaded Guava.
 publishThinShadedJar
+
+publishTestJar
