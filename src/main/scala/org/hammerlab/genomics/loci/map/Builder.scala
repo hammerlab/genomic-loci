@@ -1,19 +1,17 @@
 package org.hammerlab.genomics.loci.map
 
-import java.lang.{Long => JLong}
-
 import org.hammerlab.genomics.loci.set.LociSet
-import org.hammerlab.genomics.reference.Interval
+import org.hammerlab.genomics.reference.{ ContigName, Interval, Locus }
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /** Helper class for building a LociMap */
 private[loci] class Builder[T] {
-  private val data = new mutable.HashMap[String, ArrayBuffer[(JLong, JLong, T)]]()
+  private val data = new mutable.HashMap[ContigName, ArrayBuffer[(Locus, Locus, T)]]()
 
   /** Set the value at the given locus range in the LociMap under construction. */
-  def put(contig: String, start: Long, end: Long, value: T): Builder[T] = {
+  def put(contig: ContigName, start: Locus, end: Locus, value: T): Builder[T] = {
     assume(end >= start)
     if (end > start) {
       data
@@ -35,6 +33,6 @@ private[loci] class Builder[T] {
   }
 
   /** Build the result. */
-  def result(): LociMap[T] = LociMap.fromContigs(data.map(Contig(_)))
+  def result: LociMap[T] = LociMap.fromContigs(data.map(Contig(_)))
 }
 

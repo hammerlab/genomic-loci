@@ -1,40 +1,42 @@
 package org.hammerlab.genomics.loci.iterator
 
-import org.hammerlab.genomics.reference.{Interval, IntervalsUtil, Locus}
-import org.scalatest.{FunSuite, Matchers}
+import org.hammerlab.genomics.reference.test.LocusUtil._
+import org.hammerlab.genomics.reference.test.{ IntervalsUtil, LocusUtil }
+import org.hammerlab.genomics.reference.{ Interval, Locus }
+import org.hammerlab.test.Suite
 
 class SkippableLociIteratorSuite
-  extends FunSuite
-    with Matchers
+  extends Suite
+    with LocusUtil
     with IntervalsUtil {
 
   def strs =
     TestSkippableLociIterator(
-      10 -> "a",
-      11 -> "b",
-      20 -> "c",
-      21 -> "d",
-      30 -> "e",
-      31 -> "f",
-      33 -> "g",
-      34 -> "h",
-      40 -> "i",
-      50 -> "j"
+      10 → "a",
+      11 → "b",
+      20 → "c",
+      21 → "d",
+      30 → "e",
+      31 → "f",
+      33 → "g",
+      34 → "h",
+      40 → "i",
+      50 → "j"
     )
 
   test("no skips") {
-    strs.toList should be(
+    strs.toList should ===(
       List(
-        10 -> "a",
-        11 -> "b",
-        20 -> "c",
-        21 -> "d",
-        30 -> "e",
-        31 -> "f",
-        33 -> "g",
-        34 -> "h",
-        40 -> "i",
-        50 -> "j"
+        10 → "a",
+        11 → "b",
+        20 → "c",
+        21 → "d",
+        30 → "e",
+        31 → "f",
+        33 → "g",
+        34 → "h",
+        40 → "i",
+        50 → "j"
       )
     )
   }
@@ -48,20 +50,20 @@ class SkippableLociIteratorSuite
   test("misc skips") {
     val it = strs
     it.skipTo(15)
-    it.next() should be(20 -> "c")
+    it.next() should ===(20 → "c")
     it.skipTo(30)
-    it.next() should be(30 -> "e")
+    it.next() should ===(30 → "e")
     intercept[IllegalArgumentException] {
       it.skipTo(30)
     }
-    it.next() should be(31 -> "f")
+    it.next() should ===(31 → "f")
     it.skipTo(32)
-    it.next() should be(33 -> "g")
+    it.next() should ===(33 → "g")
     it.skipTo(34)
-    it.next() should be(34 -> "h")
+    it.next() should ===(34 → "h")
     it.skipTo(41)
-    it.next() should be(50 -> "j")
-    it.hasNext should be(false)
+    it.next() should ===(50 → "j")
+    it.hasNext should ===(false)
   }
 
   test("intersect") {
@@ -75,24 +77,23 @@ class SkippableLociIteratorSuite
           Interval(50, 51)
         ).buffered
       )
-    ).toList should be(
+    ).toList ===
       List(
-        10 -> "a",
-        30 -> "e",
-        31 -> "f",
-        33 -> "g",
-        34 -> "h",
-        40 -> "i",
-        50 -> "j"
+        10 → "a",
+        30 → "e",
+        31 → "f",
+        33 → "g",
+        34 → "h",
+        40 → "i",
+        50 → "j"
       )
-    )
   }
 }
 
 case class TestSkippableLociIterator(elems: (Int, String)*)
   extends SkippableLocusKeyedIterator[String] {
 
-  val it = elems.iterator.map(t => t._1.toLong -> t._2).buffered
+  val it = elems.iterator.map(t => (t._1: Locus) → t._2).buffered
 
   override def _advance: Option[(Locus, String)] = {
     if (!it.hasNext)
@@ -103,7 +104,7 @@ case class TestSkippableLociIterator(elems: (Int, String)*)
         _advance
       else {
         locus = nextLocus
-        Some(nextLocus.toLong -> str)
+        Some(nextLocus → str)
       }
     }
   }

@@ -1,24 +1,20 @@
-name := "genomic-loci"
-version := "1.4.4"
 
-providedDeps ++= {
-  Seq(
-    libraries.value('spark),
-    libraries.value('hadoop)
-  )
-}
+organization := "org.hammerlab.genomics"
+name := "loci"
+version := "1.5.0"
 
-libraryDependencies ++= Seq(
-  libraries.value('args4j),
-  libraries.value('args4s),
-  libraries.value('bdg_formats),
-  libraries.value('kryo),
-  "org.hammerlab" %% "iterator" % "1.0.0",
-  "org.hammerlab" %% "string-utils" % "1.0.0",
-  "com.github.samtools" % "htsjdk" % "2.6.1"
+addSparkDeps
+
+deps ++= Seq(
+  libs.value('args4j),
+  libs.value('args4s),
+  libs.value('htsjdk),
+  libs.value('iterators),
+  libs.value('scalautils),
+  libs.value('string_utils)
 )
 
-testDeps += libraries.value('spark_tests)
+compileAndTestDeps += libs.value('reference)
 
 // Shade Guava due to use of RangeSet classes from 16.0.1 that don't exist in Spark/Hadoop's Guava 11.0.2.
 shadedDeps += "com.google.guava" % "guava" % "16.0.1"
@@ -28,4 +24,6 @@ shadeRenames += "com.google.common.**" -> "org.hammerlab.guava.@1"
 shadeRenames += "com.google.thirdparty.**" -> "org.hammerlab.guava.@1"
 
 // Publish JAR that includes shaded Guava.
-ParentPlugin.publishThinShadedJar
+publishThinShadedJar
+
+publishTestJar

@@ -1,129 +1,129 @@
 package org.hammerlab.genomics.loci.map
 
-import org.hammerlab.genomics.loci.Suite
 import org.hammerlab.genomics.loci.set.LociSet
-import org.hammerlab.genomics.loci.set.test.TestLociSet
-import org.hammerlab.genomics.reference.Interval
+import org.hammerlab.genomics.loci.set.test.LociSetUtil
+import org.hammerlab.genomics.reference.test.{ ContigNameUtil, LocusUtil }
+import org.hammerlab.genomics.reference.{ ContigName, Interval }
+import org.hammerlab.test.Suite
 
-class LociMapSuite extends Suite {
+class LociMapSuite
+  extends Suite
+    with LocusUtil
+    with ContigNameUtil
+    with LociSetUtil {
 
   test("properties of empty LociMap") {
     val emptyMap = LociMap[String]()
 
-    emptyMap.count should be(0)
-    emptyMap.toString() should be("")
-    emptyMap should equal(LociMap[String]())
+    emptyMap.count should ===(0)
+    emptyMap.toString() should ===("")
+    emptyMap should ===(LociMap[String]())
   }
 
   test("basic map operations") {
     val lociMap = LociMap(
-      ("chr1",  100L, 200L, "A"),
-      ("chr20", 200L, 201L, "B")
+      ("chr1",  100, 200, "A"),
+      ("chr20", 200, 201, "B")
     )
 
-    lociMap.count should be(101)
-    lociMap.toString should be("chr1:100-200=A,chr20:200-201=B")
-    lociMap.contigs.map(_.name) should be(Seq("chr1", "chr20"))
+    lociMap.count should ===(101)
+    lociMap.toString should ===("chr1:100-200=A,chr20:200-201=B")
+    lociMap.contigs.map(_.name) should ===(Seq("chr1", "chr20"))
 
     lociMap should not equal LociMap[String]()
 
-    lociMap.inverse should equal(
+    lociMap.inverse should ===(
       Map(
-        "A" -> TestLociSet("chr1:100-200"),
-        "B" -> TestLociSet("chr20:200-201")
+        "A" → lociSet("chr1:100-200"),
+        "B" → lociSet("chr20:200-201")
       )
     )
 
-    lociMap.onContig("chr1").toString should equal("chr1:100-200=A")
-    lociMap.onContig("chr20").toString should equal("chr20:200-201=B")
+    lociMap("chr1").toString should ===("chr1:100-200=A")
+    lociMap("chr20").toString should ===("chr20:200-201=B")
   }
 
   test("asInverseMap with repeated values") {
     val lociMap = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr2", 200L, 300L, "A"),
-      ("chr3", 400L, 500L, "B")
+      ("chr1", 100, 200, "A"),
+      ("chr2", 200, 300, "A"),
+      ("chr3", 400, 500, "B")
     )
 
     // asInverseMap stuffs all Loci with the same value into a LociSet.
     lociMap.inverse should equal(
       Map(
-        "A" -> TestLociSet("chr1:100-200,chr2:200-300"),
-        "B" -> TestLociSet("chr3:400-500")
+        "A" -> lociSet("chr1:100-200,chr2:200-300"),
+        "B" -> lociSet("chr3:400-500")
       )
     )
 
-    lociMap.count should be(300)
-    lociMap.toString should be("chr1:100-200=A,chr2:200-300=A,chr3:400-500=B")
+    lociMap.count should ===(300)
+    lociMap.toString should ===("chr1:100-200=A,chr2:200-300=A,chr3:400-500=B")
   }
 
   test("range coalescing") {
     val lociMap = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr1", 400L, 500L, "B"),
-      ("chr1", 150L, 160L, "C"),
-      ("chr1", 180L, 240L, "A")
+      ("chr1", 100, 200, "A"),
+      ("chr1", 400, 500, "B"),
+      ("chr1", 150, 160, "C"),
+      ("chr1", 180, 240, "A")
     )
 
-    lociMap.inverse should be(
+    lociMap.inverse ===
       Map(
-        "A" -> TestLociSet("chr1:100-150,chr1:160-240"),
-        "B" -> TestLociSet("chr1:400-500"),
-        "C" -> TestLociSet("chr1:150-160")
+        "A" -> lociSet("chr1:100-150,chr1:160-240"),
+        "B" -> lociSet("chr1:400-500"),
+        "C" -> lociSet("chr1:150-160")
       )
-    )
 
-    lociMap.count should be(240)
-    lociMap.toString should be("chr1:100-150=A,chr1:150-160=C,chr1:160-240=A,chr1:400-500=B")
+    lociMap.count should ===(240)
+    lociMap.toString should ===("chr1:100-150=A,chr1:150-160=C,chr1:160-240=A,chr1:400-500=B")
   }
 
   test("spanning equal values merges") {
     val map = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr1", 400L, 500L, "B"),
-      ("chr1", 300L, 400L, "A"),
-      ("chr1", 199L, 301L, "A")
+      ("chr1", 100, 200, "A"),
+      ("chr1", 400, 500, "B"),
+      ("chr1", 300, 400, "A"),
+      ("chr1", 199, 301, "A")
     )
 
-    map.inverse should be(
+    map.inverse ===
       Map(
-        "A" -> TestLociSet("chr1:100-400"),
-        "B" -> TestLociSet("chr1:400-500")
+        "A" -> lociSet("chr1:100-400"),
+        "B" -> lociSet("chr1:400-500")
       )
-    )
 
-    map.onContig("chr1").asMap should be(
+    map("chr1").asMap ===
       Map(
         Interval(100, 400) -> "A",
         Interval(400, 500) -> "B"
       )
-    )
 
-    map.count should be(400)
+    map.count should ===(400)
   }
 
   test("bridging equal values merges") {
     val map = LociMap(
-      ("chr1", 100L, 200L, "A"),
-      ("chr1", 400L, 500L, "B"),
-      ("chr1", 300L, 400L, "A"),
-      ("chr1", 200L, 300L, "A")
+      ("chr1", 100, 200, "A"),
+      ("chr1", 400, 500, "B"),
+      ("chr1", 300, 400, "A"),
+      ("chr1", 200, 300, "A")
     )
 
-    map.inverse should be(
+    map.inverse ===
       Map(
-        "A" -> TestLociSet("chr1:100-400"),
-        "B" -> TestLociSet("chr1:400-500")
+        "A" -> lociSet("chr1:100-400"),
+        "B" -> lociSet("chr1:400-500")
       )
-    )
 
-    map.onContig("chr1").asMap should be(
+    map("chr1").asMap ===
       Map(
         Interval(100, 400) -> "A",
         Interval(400, 500) -> "B"
       )
-    )
 
-    map.count should be(400)
+    map.count should ===(400)
   }
 }

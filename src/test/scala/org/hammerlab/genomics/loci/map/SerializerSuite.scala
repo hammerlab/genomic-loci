@@ -1,60 +1,67 @@
 package org.hammerlab.genomics.loci.map
 
-import org.apache.spark.SparkEnv
-import org.hammerlab.genomics.loci.Suite
+import org.hammerlab.genomics.reference.test.LocusUtil
+import org.hammerlab.genomics.reference.{ ContigName, Locus }
+import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 
-class SerializerSuite extends Suite {
-
-  kryoRegister(classOf[Contig[String]], new ContigSerializer[String])
-  kryoRegister(classOf[LociMap[String]], new Serializer[String])
+class SerializerSuite
+  extends KryoSparkSuite(classOf[Registrar])
+  with SparkSerialization
+    with LocusUtil {
 
   def testSerde(
     name: String
   )(
-    ranges: (String, Long, Long, String)*
+    ranges: (ContigName, Locus, Locus, String)*
   )(
     expectedBytes: Int,
     numRanges: Int,
     count: Int
   ) = {
     test(name) {
-      val serializer = SparkEnv.get.serializer.newInstance()
+      val beforeMap = LociMap(ranges: _*)
 
-      val beforeMap = LociMap[String](ranges: _*)
+      beforeMap("chr1").asMap.size should ===(numRanges)
+      beforeMap("chr1").count should ===(count)
 
-      beforeMap.onContig("chr1").asMap.size should be(numRanges)
-      beforeMap.onContig("chr1").count should be(count)
+      val bytes = serialize(beforeMap)
+      bytes.array.length should ===(expectedBytes)
 
-      val bytes = serializer.serialize(beforeMap)
-      bytes.array.length should be(expectedBytes)
+      val afterMap: LociMap[String] = deserialize[LociMap[String]](bytes)
 
-      val afterMap: LociMap[String] = serializer.deserialize[LociMap[String]](bytes)
-
-      beforeMap should be(afterMap)
+      beforeMap should ===(afterMap)
     }
   }
 
-  testSerde("empty")()(10, 0, 0)
+  testSerde("empty")()(9, 0, 0)
 
   testSerde("1")(
     ("chr1", 100L, 200L, "A")
-  )(43, 1, 100)
+  )(
+    40, 1, 100
+  )
 
   testSerde("2")(
     ("chr1", 100L, 200L, "A"),
     ("chr1", 400L, 500L, "B")
-  )(63, 2, 200)
+  )(
+    59, 2, 200
+  )
 
   testSerde("3")(
     ("chr1", 100L, 200L, "A"),
     ("chr1", 400L, 500L, "B"),
     ("chr1", 600L, 700L, "C")
-  )(83, 3, 300)
+  )(
+    78, 3, 300
+  )
 
   testSerde("4")(
     ("chr1", 100L, 200L, "A"),
     ("chr1", 400L, 500L, "B"),
     ("chr1", 600L, 700L, "C"),
     ("chr1", 700L, 800L, "A")
-  )(101, 4, 400)
+  )(
+    97, 4, 400
+  )
 }

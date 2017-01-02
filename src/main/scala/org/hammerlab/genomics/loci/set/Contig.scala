@@ -1,11 +1,11 @@
 package org.hammerlab.genomics.loci.set
 
-import java.io.{ObjectInputStream, ObjectOutputStream}
-import java.lang.{Long => JLong}
+import java.io.{ ObjectInputStream, ObjectOutputStream }
 
-import com.google.common.collect.{RangeSet, TreeRangeSet, Range => JRange}
+import com.google.common.collect.{ RangeSet, TreeRangeSet, Range ⇒ JRange }
 import org.hammerlab.genomics.loci.iterator.LociIterator
-import org.hammerlab.genomics.reference.{ContigName, Interval, Locus}
+import org.hammerlab.genomics.reference.Interval.orderByStart
+import org.hammerlab.genomics.reference.{ ContigName, Interval, Locus, NumLoci, Region }
 import org.hammerlab.strings.TruncatedToString
 
 import scala.collection.JavaConversions._
@@ -14,30 +14,32 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * A set of loci on a contig, stored/manipulated as loci ranges.
  */
-case class Contig(var name: ContigName, private var rangeSet: RangeSet[JLong]) extends TruncatedToString {
+case class Contig(var name: ContigName, private var rangeSet: RangeSet[Locus]) extends TruncatedToString {
+
+  import Contig.lociRange
 
   private def readObject(in: ObjectInputStream): Unit = {
     name = in.readUTF()
     val num = in.readInt()
-    rangeSet = TreeRangeSet.create[JLong]()
+    rangeSet = TreeRangeSet.create[Locus]()
     for {
       i <- 0 until num
     } {
       val start = in.readLong()
       val end = in.readLong()
-      val range = JRange.closedOpen[JLong](start, end)
+      val range = lociRange(start, end)
       rangeSet.add(range)
     }
   }
 
   private def writeObject(out: ObjectOutputStream): Unit = {
-    out.writeUTF(name)
+    out.writeUTF(name.name)
     out.writeInt(ranges.length)
     for {
       Interval(start, end) <- ranges
     } {
-      out.writeLong(start)
-      out.writeLong(end)
+      out.writeLong(start.locus)
+      out.writeLong(end.locus)
     }
   }
 
@@ -45,13 +47,14 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[JLong]) e
   def contains(locus: Locus): Boolean = rangeSet.contains(locus)
 
   /** This set as a regular scala array of ranges. */
-  lazy val ranges: Vector[Interval] = {
+  lazy val ranges: Vector[Interval] =
     rangeSet
       .asRanges()
       .map(range => Interval(range.lowerEndpoint(), range.upperEndpoint()))
       .toVector
-      .sortBy(x => x)
-  }
+      .sorted(orderByStart)
+
+  def regions: Iterator[Region] = ranges.iterator.map(range ⇒ Region(name, range))
 
   /** Is this contig empty? */
   def isEmpty: Boolean = rangeSet.isEmpty
@@ -62,10 +65,10 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[JLong]) e
   def iterator = new LociIterator(ranges.iterator.buffered)
 
   /** Number of loci on this contig. */
-  def count = ranges.map(_.length).sum
+  def count: NumLoci = ranges.map(_.length: Long).sum
 
   /** Returns whether a given genomic region overlaps with any loci on this contig. */
-  def intersects(start: Long, end: Long): Boolean = !rangeSet.subRangeSet(JRange.closedOpen(start, end)).isEmpty
+  def intersects(start: Locus, end: Locus): Boolean = !rangeSet.subRangeSet(lociRange(start, end)).isEmpty
 
   /**
    * Make two new Contigs: one with the first @numToTake loci from this Contig, and the second with the rest.
@@ -100,15 +103,12 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[JLong]) e
    * Iterator over string representations of each range in the map, used to assemble (possibly truncated) .toString()
    * output.
    */
-  def stringPieces =
-    ranges.iterator.map(pair =>
-      "%s:%d-%d".format(name, pair.start, pair.end)
-    )
+  def stringPieces = regions.map(_.toString)
 }
 
 object Contig {
   // Empty-contig constructor, for convenience.
-  def apply(name: ContigName): Contig = Contig(name, TreeRangeSet.create[JLong]())
+  def apply(name: ContigName): Contig = Contig(name, TreeRangeSet.create[Locus]())
 
   // Constructors that make a Contig from its name and some ranges.
   def apply(tuple: (ContigName, Iterable[Interval])): Contig = Contig(tuple._1, tuple._2)
@@ -116,13 +116,15 @@ object Contig {
     Contig(
       name,
       {
-        val rangeSet = TreeRangeSet.create[JLong]()
+        val rangeSet = TreeRangeSet.create[Locus]()
         for {
           Interval(start, end) <- ranges
         } {
-          rangeSet.add(JRange.closedOpen(start, end))
+          rangeSet.add(lociRange(start, end))
         }
         rangeSet
       }
     )
+
+  def lociRange(start: Locus, end: Locus): JRange[Locus] = JRange.closedOpen[Locus](start, end)
 }

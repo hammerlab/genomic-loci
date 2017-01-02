@@ -38,17 +38,18 @@ object ParsedLociRange {
         None
       case contigAndLoci(name, startStr, endStrOpt) =>
         val start = startStr.toLong
-        val endOpt = Option(endStrOpt) match {
-          case Some("") => None
-          case Some(s) => Some(s.toLong)
-          case None => Some(start + 1)
-        }
+        val endOpt: Option[Locus] =
+          Option(endStrOpt) match {
+            case Some("") => None
+            case Some(s) => Some(s.toLong)
+            case None => Some(start + 1)
+          }
+
         Some(LociRange(name, start, endOpt))
       case contigOnly(contig) =>
-        Some(LociRange(contig, 0, None))
-      case other => {
+        Some(LociRange(contig, Locus(0), None))
+      case other =>
         throw new IllegalArgumentException(s"Couldn't parse loci range: $other")
-      }
     }
 }
 
