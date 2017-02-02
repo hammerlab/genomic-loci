@@ -2,12 +2,13 @@ package org.hammerlab.genomics.loci.parsing
 
 import org.apache.hadoop.conf.Configuration
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
-import org.hammerlab.genomics.reference.test.LocusUtil
+import org.hammerlab.genomics.reference.test.ClearContigNames
+import org.hammerlab.genomics.reference.test.LociConversions.intToLocus
 import org.hammerlab.test.Suite
 
 class ParsedLociSuite
   extends Suite
-    with LocusUtil
+    with ClearContigNames
     with LociSetUtil {
 
   val conf = new Configuration

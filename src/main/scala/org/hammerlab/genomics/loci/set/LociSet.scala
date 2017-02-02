@@ -26,7 +26,7 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
   @transient lazy val contigs = map.values.toArray
 
   /** The number of loci in this LociSet. */
-  @transient lazy val count: NumLoci = contigs.map(_.count: Long).sum
+  @transient lazy val count: NumLoci = contigs.map(_.count).sum
 
   def isEmpty = map.isEmpty
   def nonEmpty = map.nonEmpty

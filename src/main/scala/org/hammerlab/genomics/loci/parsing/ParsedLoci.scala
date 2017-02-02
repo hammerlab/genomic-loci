@@ -7,6 +7,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.hammerlab.genomics.loci.VariantContext
 import org.hammerlab.genomics.loci.args.LociArgs
+import org.hammerlab.genomics.reference.ContigName.Factory
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
@@ -35,11 +36,9 @@ import scala.io.Source
 sealed trait ParsedLoci extends Any
 
 object ParsedLoci {
-  val empty = apply("")
+  def apply(lociStrs: String)(implicit factory: Factory): ParsedLoci = apply(Iterator(lociStrs))
 
-  def apply(lociStrs: String): ParsedLoci = apply(Iterator(lociStrs))
-
-  def apply(lines: Iterator[String]): ParsedLoci = {
+  def apply(lines: Iterator[String])(implicit factory: Factory): ParsedLoci = {
     val lociRanges = ArrayBuffer[LociRange]()
     for {
       lociStrs <- lines
@@ -65,7 +64,7 @@ object ParsedLoci {
 
   def fromArgs(lociStrOpt: Option[String],
                lociFileOpt: Option[String],
-               hadoopConfiguration: Configuration): Option[ParsedLoci] =
+               hadoopConfiguration: Configuration)(implicit factory: Factory): Option[ParsedLoci] =
     (lociStrOpt, lociFileOpt) match {
       case (Some(lociStr), _) => Some(ParsedLoci(lociStr))
       case (_, Some(lociFile)) => Some(loadFromFile(lociFile, hadoopConfiguration))
@@ -81,7 +80,7 @@ object ParsedLoci {
    *                 "chrX:5-10,chr12-10-20", etc. Whitespace is ignored.
    * @return parsed loci
    */
-  private def loadFromFile(lociFile: String, hadoopConfiguration: Configuration): ParsedLoci =
+  private def loadFromFile(lociFile: String, hadoopConfiguration: Configuration)(implicit factory: Factory): ParsedLoci =
     if (lociFile.endsWith(".vcf")) {
       LociRanges.fromVCF(lociFile)
     } else if (lociFile.endsWith(".loci") || lociFile.endsWith(".txt")) {

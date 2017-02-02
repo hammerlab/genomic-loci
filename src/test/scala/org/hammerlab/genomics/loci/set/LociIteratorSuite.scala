@@ -2,9 +2,8 @@ package org.hammerlab.genomics.loci.set
 
 import org.hammerlab.genomics.loci.iterator.LociIterator
 import org.hammerlab.genomics.reference.Interval
-import org.hammerlab.genomics.reference.test.LocusUtil._
+import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.test.Suite
-import org.hammerlab.test.implicits.toList
 
 class LociIteratorSuite extends Suite {
 

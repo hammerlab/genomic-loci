@@ -1,13 +1,12 @@
 package org.hammerlab.genomics.loci.map
 
-import org.hammerlab.genomics.reference.test.LocusUtil
+import org.hammerlab.genomics.reference.test.LociConversions.intToLocus
 import org.hammerlab.genomics.reference.{ ContigName, Locus }
 import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 
 class SerializerSuite
   extends KryoSparkSuite(classOf[Registrar])
-  with SparkSerialization
-    with LocusUtil {
+  with SparkSerialization {
 
   def testSerde(
     name: String

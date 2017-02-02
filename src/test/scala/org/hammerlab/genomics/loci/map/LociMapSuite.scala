@@ -1,15 +1,13 @@
 package org.hammerlab.genomics.loci.map
 
-import org.hammerlab.genomics.loci.set.LociSet
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
-import org.hammerlab.genomics.reference.test.{ ContigNameUtil, LocusUtil }
-import org.hammerlab.genomics.reference.{ ContigName, Interval }
+import org.hammerlab.genomics.reference.Interval
+import org.hammerlab.genomics.reference.test.LociConversions.intToLocus
+import org.hammerlab.genomics.reference.test.ContigNameConversions.toSeq
 import org.hammerlab.test.Suite
 
 class LociMapSuite
   extends Suite
-    with LocusUtil
-    with ContigNameUtil
     with LociSetUtil {
 
   test("properties of empty LociMap") {

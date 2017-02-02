@@ -2,10 +2,15 @@ package org.hammerlab.genomics.loci.map
 
 import com.google.common.collect.{ ImmutableRangeMap, Range }
 import org.hammerlab.genomics.reference.Locus
+import org.hammerlab.genomics.reference.test.ClearContigNames
 import org.hammerlab.test.Suite
-import org.hammerlab.genomics.reference.test.LocusUtil._
+import org.hammerlab.genomics.reference.test.LociConversions._
+import org.hammerlab.genomics.reference.test.ContigNameConversions._
 
-class ContigSuite extends Suite {
+class ContigSuite
+  extends Suite
+    with ClearContigNames {
+
   test("empty") {
     val contigMap = new Contig("chr1", ImmutableRangeMap.builder[Locus, String]().build())
 

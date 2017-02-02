@@ -4,7 +4,10 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream,
 
 import org.apache.spark.broadcast.Broadcast
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
-import org.hammerlab.genomics.reference.test.{ ContigNameUtil, LocusUtil }
+import org.hammerlab.genomics.reference.ContigName.Factory
+import org.hammerlab.genomics.reference.Locus
+import org.hammerlab.genomics.reference.test.ClearContigNames
+import org.hammerlab.genomics.reference.test.LociConversions.{ intToLocus, toArray, toSeq }
 import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 
 import scala.collection.mutable
@@ -12,23 +15,26 @@ import scala.collection.mutable
 class SerializerSuite
   extends KryoSparkSuite(classOf[Registrar], referenceTracking = true)
     with SparkSerialization
-    with LocusUtil
+    with ClearContigNames
     with LociSetUtil
     with Serializable {
 
   import Helpers._
+  import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
 
   // "a closure that includes a LociSet" parallelizes some Range[Long]s.
-  kryoRegister(classOf[Range])
-  kryoRegister(classOf[Array[Int]])
+  register(
+    classOf[Range],
+    classOf[Array[Locus]],
 
-  // "make an RDD[LociSet] and an RDD[Contig]" collects some Strings.
-  kryoRegister(classOf[Array[String]])
+    // "make an RDD[LociSet] and an RDD[Contig]" collects some Strings.
+    classOf[Array[String]],
 
-  kryoRegister(classOf[mutable.WrappedArray.ofRef[_]])
+    classOf[mutable.WrappedArray.ofRef[_]]
+  )
 
   test("make an RDD[LociSet]") {
-
+    import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
     val sets =
       List[LociSet](
         "",
@@ -46,6 +52,7 @@ class SerializerSuite
   }
 
   test("make an RDD[LociSet], and an RDD[Contig]") {
+    import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
     val sets =
       List[LociSet](
         "",
@@ -70,7 +77,7 @@ class SerializerSuite
   test("a closure that includes a LociSet") {
     val set: LociSet = "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10"
     val setBC = sc.broadcast(set)
-    val rdd = sc.parallelize(0 until 1000)
+    val rdd = sc.parallelize[Locus](0 until 1000)
     val result = rdd.filter(lociSetFilterTask(setBC)).collect
     result should ===(100 until 200)
   }
@@ -95,9 +102,7 @@ class SerializerSuite
 
 }
 
-object Helpers
-  extends LocusUtil
-    with ContigNameUtil {
+object Helpers {
 
   /**
    * Isolate this method in its own object because otherwise ClosureCleaner will attempt to Java-serialize the enclosing
@@ -107,11 +112,11 @@ object Helpers
   def lociSetMapTask(set: LociSet): String = {
     set("21").contains(5)
     // no op
-    val ranges = set("21").ranges // no op
+    val _ = set("21").ranges // no op
     set("20").toString
   }
 
-  def lociSetFilterTask(setBC: Broadcast[LociSet]) =
-    (i: Int) ⇒
-      setBC.value("chr21").contains(i)
+  def lociSetFilterTask(setBC: Broadcast[LociSet])(implicit factory: Factory) =
+    (locus: Locus) ⇒
+      setBC.value("chr21").contains(locus)
 }
