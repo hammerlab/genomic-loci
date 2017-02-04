@@ -5,6 +5,7 @@ import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.test.ClearContigNames
 import org.hammerlab.genomics.reference.test.LociConversions.intToLocus
 import org.hammerlab.test.Suite
+import org.hammerlab.test.resources.File
 
 class ParsedLociSuite
   extends Suite
@@ -19,7 +20,7 @@ class ParsedLociSuite
       lociSet(
         ParsedLoci.fromArgs(
           lociStrOpt = None,
-          lociFileOpt = Some("src/test/resources/truth.chr20.vcf"),
+          lociFileOpt = Some(File("truth.chr20.vcf").path),
           conf
         ).get
       )
