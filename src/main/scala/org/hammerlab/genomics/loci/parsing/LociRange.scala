@@ -1,6 +1,7 @@
 package org.hammerlab.genomics.loci.parsing
 
-import org.hammerlab.genomics.reference.{ContigName, Locus}
+import org.hammerlab.genomics.reference.ContigName.Factory
+import org.hammerlab.genomics.reference.{ ContigName, Locus }
 
 /**
  * Representation of a genomic range as parsed from a cmdline-flag or file.
@@ -30,7 +31,7 @@ object ParsedLociRange {
    *  "chr1:10000": just chr1, position 10000; equivalent to "chr1:10000-10001".
    *  "chr1:10000-": chr1, from position 10000 to the end of chr1.
    */
-  def apply(lociRangeStr: String): Option[ParsedLociRange] =
+  def apply(lociRangeStr: String)(implicit factory: Factory): Option[ParsedLociRange] =
     lociRangeStr.replaceAll("\\s", "") match {
       case "all" =>
         Some(AllRange)

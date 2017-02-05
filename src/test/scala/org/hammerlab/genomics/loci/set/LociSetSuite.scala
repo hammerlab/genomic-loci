@@ -2,9 +2,9 @@ package org.hammerlab.genomics.loci.set
 
 import org.hammerlab.genomics.loci.parsing.ParsedLoci
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
-import org.hammerlab.genomics.reference.test.ContigLengthsUtil._
-import org.hammerlab.genomics.reference.test.ContigNameUtil
-import org.hammerlab.genomics.reference.test.LocusUtil._
+import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil }
+import org.hammerlab.genomics.reference.test.ContigNameConversions.toArray
+import org.hammerlab.genomics.reference.test.LociConversions.{ intToLocus, toSeq }
 import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci }
 import org.hammerlab.spark.test.suite.KryoSparkSuite
 
@@ -12,11 +12,14 @@ import scala.collection.mutable
 
 class LociSetSuite
   extends KryoSparkSuite(classOf[Registrar])
-    with ContigNameUtil
-    with LociSetUtil {
+    with LociSetUtil
+    with ClearContigNames
+    with ContigLengthsUtil {
+
+  import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
 
   // "loci set invariants" collects some LociSets
-  kryoRegister(classOf[mutable.WrappedArray.ofRef[_]])
+  register(classOf[mutable.WrappedArray.ofRef[_]])
 
   def makeLociSet(str: String, lengths: (ContigName, NumLoci)*): LociSet =
     LociSet(ParsedLoci(str), lengths.toMap)
@@ -65,7 +68,7 @@ class LociSetSuite
     set("chr21").intersects(90, 100) should ===(false)
     set("chr21").intersects(90, 101) should ===(true)
     set("chr21").intersects(90, 95) should ===(false)
-    set("chr21").iterator.toSeq should ===((100 until 200))
+    set("chr21").iterator.toSeq should ===(100 until 200)
   }
 
   test("single loci parsing") {
@@ -77,15 +80,17 @@ class LociSetSuite
   }
 
   test("loci set invariants") {
-    val sets = List(
-      "",
-      "empty:20-20,empty2:30-30",
-      "20:100-200",
-      "with_dots.and_underscores..2:100-200",
-      "21:300-400",
-      "X:5-17,X:19-22,Y:50-60",
-      "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120"
-    ).map(lociSet(_))
+    val sets =
+      List(
+        "",
+        "empty:20-20,empty2:30-30",
+        "20:100-200",
+        "with_dots.and_underscores..2:100-200",
+        "21:300-400",
+        "X:5-17,X:19-22,Y:50-60",
+        "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120"
+      )
+      .map(lociSet)
 
     def checkInvariants(set: LociSet): Unit = {
       set should not be null
@@ -103,6 +108,7 @@ class LociSetSuite
         result should ===(set)
       }
     }
+
     sets.foreach(checkInvariants)
   }
 

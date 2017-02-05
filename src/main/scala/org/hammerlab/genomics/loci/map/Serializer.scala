@@ -1,7 +1,7 @@
 package org.hammerlab.genomics.loci.map
 
-import com.esotericsoftware.kryo.io.{Input, Output}
-import com.esotericsoftware.kryo.{Kryo, Serializer => KryoSerializer}
+import com.esotericsoftware.kryo.io.{ Input, Output }
+import com.esotericsoftware.kryo.{ Kryo, Serializer ⇒ KryoSerializer }
 
 /**
  * We serialize a LociMap simply by writing out all of its Contigs.

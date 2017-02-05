@@ -1,13 +1,12 @@
 package org.hammerlab.genomics.loci.iterator
 
-import org.hammerlab.genomics.reference.test.LocusUtil._
-import org.hammerlab.genomics.reference.test.{ IntervalsUtil, LocusUtil }
+import org.hammerlab.genomics.reference.test.IntervalsUtil
+import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.genomics.reference.{ Interval, Locus }
 import org.hammerlab.test.Suite
 
 class SkippableLociIteratorSuite
   extends Suite
-    with LocusUtil
     with IntervalsUtil {
 
   def strs =
