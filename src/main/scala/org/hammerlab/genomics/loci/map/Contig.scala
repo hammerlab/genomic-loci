@@ -37,7 +37,7 @@ case class Contig[T](name: ContigName, private val rangeMap: RangeMap[Locus, T])
   def getAll(start: Locus, end: Locus): Set[T] = getAll(start, end, halfWindowSize = 0)
   def getAll(start: Locus, end: Locus, halfWindowSize: Int): Set[T] =
     rangeMap
-      .subRangeMap(lociRange(start.locus - halfWindowSize, end.locus + halfWindowSize))
+      .subRangeMap(lociRange(start - halfWindowSize, end + halfWindowSize))
       .asMapOfRanges
       .values
       .toSet

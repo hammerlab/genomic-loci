@@ -2,10 +2,9 @@ package org.hammerlab.genomics.loci.set
 
 import org.hammerlab.genomics.loci.parsing.ParsedLoci
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
-import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil }
-import org.hammerlab.genomics.reference.test.ContigNameConversions.toArray
-import org.hammerlab.genomics.reference.test.LociConversions.{ intToLocus, toSeq }
-import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci }
+import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil, LenientContigNameConversions }
+import org.hammerlab.genomics.reference.test.LociConversions._
+import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci, PermissiveRegistrar }
 import org.hammerlab.spark.test.suite.KryoSparkSuite
 
 import scala.collection.mutable
@@ -13,13 +12,15 @@ import scala.collection.mutable
 class LociSetSuite
   extends KryoSparkSuite(classOf[Registrar])
     with LociSetUtil
+    with LenientContigNameConversions
     with ClearContigNames
     with ContigLengthsUtil {
 
-  import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
-
   // "loci set invariants" collects some LociSets
-  register(classOf[mutable.WrappedArray.ofRef[_]])
+  register(
+    classOf[mutable.WrappedArray.ofRef[_]],
+    PermissiveRegistrar
+  )
 
   def makeLociSet(str: String, lengths: (ContigName, NumLoci)*): LociSet =
     LociSet(ParsedLoci(str), lengths.toMap)
@@ -160,17 +161,20 @@ class LociSetSuite
     iter1.next() should ===(2)
     iter1.next() should ===(10)
     iter1.next() should ===(11)
-    iter1.skipTo(6000000000L)  // will hang if it steps through each locus.
-    iter1.next() should ===(6000000000L)
-    iter1.next() should ===(6000000001L)
+
+    val sixBillion = Locus(6000000000L)
+    iter1.skipTo(sixBillion)  // will hang if it steps through each locus.
+    iter1.next() should ===(sixBillion)
+    iter1.next() should ===(sixBillion.next)
     iter1.hasNext should ===(true)
 
+    val hundredBillion = Locus(100000000000L)
     val iter2 = set("chr1").iterator
-    iter2.skipTo(100000000000L)
+    iter2.skipTo(hundredBillion)
     iter2.hasNext should ===(false)
 
     val iter3 = set("chr1").iterator
-    iter3.skipTo(100000000000L - 1)
+    iter3.skipTo(hundredBillion.prev)
     iter3.hasNext should ===(true)
     iter3.next() should ===(100000000000L - 1)
     iter3.hasNext should ===(false)

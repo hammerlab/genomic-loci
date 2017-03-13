@@ -20,7 +20,7 @@ class ParsedLociSuite
       lociSet(
         ParsedLoci.fromArgs(
           lociStrOpt = None,
-          lociFileOpt = Some(File("truth.chr20.vcf").path),
+          lociFileOpt = Some(File("truth.chr20.vcf")),
           conf
         ).get
       )

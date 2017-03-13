@@ -25,8 +25,8 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[Locus]) e
     for {
       i <- 0 until num
     } {
-      val start = in.readLong()
-      val end = in.readLong()
+      val start = Locus(in.readLong())
+      val end = Locus(in.readLong())
       val range = lociRange(start, end)
       rangeSet.add(range)
     }
@@ -65,7 +65,7 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[Locus]) e
   def iterator = new LociIterator(ranges.iterator.buffered)
 
   /** Number of loci on this contig. */
-  def count: NumLoci = ranges.map(_.length: Long).sum
+  def count: NumLoci = ranges.map(_.length).sum
 
   /** Returns whether a given genomic region overlaps with any loci on this contig. */
   def intersects(start: Locus, end: Locus): Boolean = !rangeSet.subRangeSet(lociRange(start, end)).isEmpty
@@ -75,7 +75,7 @@ case class Contig(var name: ContigName, private var rangeSet: RangeSet[Locus]) e
    *
    * Used by LociSet.take.
    */
-  private[set] def take(numToTake: Long): (Contig, Contig) = {
+  private[set] def take(numToTake: NumLoci): (Contig, Contig) = {
     val firstRanges = ArrayBuffer[Interval]()
     val secondRanges = ArrayBuffer[Interval]()
 

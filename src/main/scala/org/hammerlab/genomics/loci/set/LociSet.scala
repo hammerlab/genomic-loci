@@ -147,9 +147,9 @@ object LociSet {
       .map(Contig(_))
     )
 
-  def apply(ranges: ParsedLoci, contigLengths: ContigLengths): LociSet =
+  def apply(loci: ParsedLoci, contigLengths: ContigLengths): LociSet =
     LociSet(
-      ranges match {
+      loci match {
         case All =>
           for {
             (contig, length) <- contigLengths
