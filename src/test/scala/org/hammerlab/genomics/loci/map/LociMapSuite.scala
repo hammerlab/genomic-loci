@@ -3,11 +3,12 @@ package org.hammerlab.genomics.loci.map
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.Interval
 import org.hammerlab.genomics.reference.test.LociConversions.intToLocus
-import org.hammerlab.genomics.reference.test.ContigNameConversions.toSeq
+import org.hammerlab.genomics.reference.test.ContigNameConversions
 import org.hammerlab.test.Suite
 
 class LociMapSuite
   extends Suite
+    with ContigNameConversions
     with LociSetUtil {
 
   test("properties of empty LociMap") {

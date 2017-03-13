@@ -10,7 +10,7 @@ class LociIteratorSuite extends Suite {
   def loci(intervals: (Int, Int)*): LociIterator =
     new LociIterator(
       (for {
-        (start, end) <- intervals
+        (start, end) ← intervals
       } yield
         Interval(start, end)
       )
@@ -19,17 +19,17 @@ class LociIteratorSuite extends Suite {
     )
 
   test("simple") {
-    loci(100 -> 110).toList should ===(100 until 110)
+    loci(100 → 110).toSeq should ===(100 until 110)
   }
 
   test("skipTo") {
     val it = loci(100 -> 110)
     it.skipTo(103)
     it.head should ===(103)
-    it.toList should ===(103 until 110)
+    it.toSeq should ===(103 until 110)
   }
 
   test("intervals") {
-    loci(100 -> 110, 120 -> 130).toList should ===((100 until 110) ++ (120 until 130))
+    loci(100 → 110, 120 → 130).toSeq should ===((100 until 110) ++ (120 until 130))
   }
 }

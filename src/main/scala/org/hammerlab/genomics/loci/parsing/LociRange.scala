@@ -38,12 +38,12 @@ object ParsedLociRange {
       case "none" | "" =>
         None
       case contigAndLoci(name, startStr, endStrOpt) =>
-        val start = startStr.toLong
+        val start = Locus(startStr.toLong)
         val endOpt: Option[Locus] =
           Option(endStrOpt) match {
             case Some("") => None
-            case Some(s) => Some(s.toLong)
-            case None => Some(start + 1)
+            case Some(s) => Some(Locus(s.toLong))
+            case None => Some(start.next)
           }
 
         Some(LociRange(name, start, endOpt))

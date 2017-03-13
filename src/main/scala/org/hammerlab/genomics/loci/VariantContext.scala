@@ -8,8 +8,8 @@ object VariantContext {
     Some(
       (
         vc.getContig,
-        vc.getStart - 1L,
-        vc.getEnd.toLong
+        Locus(vc.getStart - 1L),
+        Locus(vc.getEnd.toLong)
       )
     )
 }

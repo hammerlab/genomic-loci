@@ -5,9 +5,9 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream,
 import org.apache.spark.broadcast.Broadcast
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.ContigName.Factory
-import org.hammerlab.genomics.reference.Locus
-import org.hammerlab.genomics.reference.test.ClearContigNames
-import org.hammerlab.genomics.reference.test.LociConversions.{ intToLocus, toArray, toSeq }
+import org.hammerlab.genomics.reference.{ Locus, PermissiveRegistrar }
+import org.hammerlab.genomics.reference.test.{ ClearContigNames, LenientContigNameConversions }
+import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 
 import scala.collection.mutable
@@ -15,12 +15,12 @@ import scala.collection.mutable
 class SerializerSuite
   extends KryoSparkSuite(classOf[Registrar], referenceTracking = true)
     with SparkSerialization
+    with LenientContigNameConversions
     with ClearContigNames
     with LociSetUtil
     with Serializable {
 
   import Helpers._
-  import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
 
   // "a closure that includes a LociSet" parallelizes some Range[Long]s.
   register(
@@ -30,11 +30,12 @@ class SerializerSuite
     // "make an RDD[LociSet] and an RDD[Contig]" collects some Strings.
     classOf[Array[String]],
 
-    classOf[mutable.WrappedArray.ofRef[_]]
+    classOf[mutable.WrappedArray.ofRef[_]],
+
+    PermissiveRegistrar
   )
 
   test("make an RDD[LociSet]") {
-    import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
     val sets =
       List[LociSet](
         "",
@@ -52,7 +53,6 @@ class SerializerSuite
   }
 
   test("make an RDD[LociSet], and an RDD[Contig]") {
-    import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
     val sets =
       List[LociSet](
         "",
@@ -77,7 +77,7 @@ class SerializerSuite
   test("a closure that includes a LociSet") {
     val set: LociSet = "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10"
     val setBC = sc.broadcast(set)
-    val rdd = sc.parallelize[Locus](0 until 1000)
+    val rdd = sc.parallelize[Locus]((0 until 1000).toSeq)
     val result = rdd.filter(lociSetFilterTask(setBC)).collect
     result should ===(100 until 200)
   }

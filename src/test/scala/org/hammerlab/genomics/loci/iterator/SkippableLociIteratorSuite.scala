@@ -24,7 +24,7 @@ class SkippableLociIteratorSuite
     )
 
   test("no skips") {
-    strs.toList should ===(
+    strs.toSeq should ===(
       List(
         10 → "a",
         11 → "b",
@@ -76,8 +76,8 @@ class SkippableLociIteratorSuite
           Interval(50, 51)
         ).buffered
       )
-    ).toList ===
-      List(
+    ).toSeq ===
+      Seq(
         10 → "a",
         30 → "e",
         31 → "f",

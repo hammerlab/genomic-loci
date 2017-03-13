@@ -2,13 +2,13 @@ package org.hammerlab.genomics.loci.map
 
 import com.google.common.collect.{ ImmutableRangeMap, Range }
 import org.hammerlab.genomics.reference.Locus
-import org.hammerlab.genomics.reference.test.ClearContigNames
-import org.hammerlab.test.Suite
+import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigNameConversions }
 import org.hammerlab.genomics.reference.test.LociConversions._
-import org.hammerlab.genomics.reference.test.ContigNameConversions._
+import org.hammerlab.test.Suite
 
 class ContigSuite
   extends Suite
+    with ContigNameConversions
     with ClearContigNames {
 
   test("empty") {
