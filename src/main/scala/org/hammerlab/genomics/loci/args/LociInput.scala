@@ -1,6 +1,6 @@
 package org.hammerlab.genomics.loci.args
 
-import java.nio.file.Path
+import org.hammerlab.paths.Path
 
 trait LociInput {
   def lociStrOpt: Option[String]

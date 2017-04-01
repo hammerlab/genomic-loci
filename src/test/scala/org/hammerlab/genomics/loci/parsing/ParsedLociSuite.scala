@@ -18,9 +18,9 @@ class ParsedLociSuite
   test("vcf loading") {
     val loci =
       lociSet(
-        ParsedLoci.fromArgs(
+        ParsedLoci(
           lociStrOpt = None,
-          lociFileOpt = Some(File("truth.chr20.vcf")),
+          lociFileOpt = Some(File("truth.chr20.vcf").path),
           conf
         ).get
       )

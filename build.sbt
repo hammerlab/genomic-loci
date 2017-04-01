@@ -10,6 +10,7 @@ deps ++= Seq(
   libs.value('args4s),
   libs.value('htsjdk),
   libs.value('iterators),
+  libs.value('paths),
   libs.value('scalautils),
   libs.value('string_utils)
 )

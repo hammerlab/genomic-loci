@@ -1,13 +1,11 @@
 package org.hammerlab.genomics.loci.parsing
 
-import java.nio.file.{ Files, Path }
-
 import htsjdk.variant.vcf.VCFFileReader
-import org.apache.commons.io.FilenameUtils
 import org.apache.hadoop.conf.Configuration
 import org.hammerlab.genomics.loci.VariantContext
 import org.hammerlab.genomics.loci.args.LociArgs
 import org.hammerlab.genomics.reference.ContigName.Factory
+import org.hammerlab.paths.Path
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
@@ -58,12 +56,13 @@ object ParsedLoci {
    * (lociFileOpt), and return a [[ParsedLoci]] encapsulating the result. The latter can then be converted into a
    * [[org.hammerlab.genomics.loci.set.LociSet]] when contig-lengths are available / have been parsed from read-sets.
    */
-  def fromArgs(args: LociArgs, hadoopConfiguration: Configuration): Option[ParsedLoci] =
-    fromArgs(args.lociStrOpt, args.lociFileOpt, hadoopConfiguration)
+  def apply(args: LociArgs,
+            hadoopConfiguration: Configuration): Option[ParsedLoci] =
+    apply(args.lociStrOpt, args.lociFileOpt, hadoopConfiguration)
 
-  def fromArgs(lociStrOpt: Option[String],
-               lociFileOpt: Option[Path],
-               hadoopConfiguration: Configuration)(implicit factory: Factory): Option[ParsedLoci] =
+  def apply(lociStrOpt: Option[String],
+            lociFileOpt: Option[Path],
+            hadoopConfiguration: Configuration)(implicit factory: Factory): Option[ParsedLoci] =
     (lociStrOpt, lociFileOpt) match {
       case (Some(lociStr), _) => Some(ParsedLoci(lociStr))
       case (_, Some(lociPath)) => Some(loadFromPath(lociPath, hadoopConfiguration))
@@ -79,10 +78,11 @@ object ParsedLoci {
    *                 "chrX:5-10,chr12-10-20", etc. Whitespace is ignored.
    * @return parsed loci
    */
-  private def loadFromPath(path: Path, hadoopConfiguration: Configuration)(implicit factory: Factory): ParsedLoci =
-    FilenameUtils.getExtension(path.toString) match {
+  private def loadFromPath(path: Path,
+                           hadoopConfiguration: Configuration)(implicit factory: Factory): ParsedLoci =
+    path.extension match {
       case "vcf" ⇒ LociRanges.fromVCF(path)
-      case "loci" | "txt" ⇒ ParsedLoci(Files.lines(path).iterator())
+      case "loci" | "txt" ⇒ ParsedLoci(path.lines)
       case _ ⇒
         throw new IllegalArgumentException(
           s"Couldn't guess format for file: $path. Expected file extensions: '.loci' or '.txt' for loci string format; '.vcf' for VCFs."
