@@ -12,6 +12,7 @@ import org.scalatest.Suite
  */
 trait LociSetUtil {
   self: Suite ⇒
+  implicit def parsedLociFromString(lociStr: String)(implicit factory: Factory): ParsedLoci = ParsedLoci(lociStr)
   implicit def lociSetFromParsedLoci(parsedLoci: ParsedLoci): LociSet = LociSet(parsedLoci, ContigLengths.empty)
   implicit def lociSetFromString(lociStr: String)(implicit factory: Factory): LociSet = ParsedLoci(lociStr)
   def lociSet(lociStr: String)(implicit factory: Factory): LociSet = lociStr
