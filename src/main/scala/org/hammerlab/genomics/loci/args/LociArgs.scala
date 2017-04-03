@@ -1,10 +1,12 @@
 package org.hammerlab.genomics.loci.args
 
-import org.hammerlab.args4s.StringOptionHandler
-import org.kohsuke.args4j.{ Option => Args4jOption }
+import org.hammerlab.args4s.{ PathOptionHandler, StringOptionHandler }
+import org.hammerlab.paths.Path
+import org.kohsuke.args4j.{ Option ⇒ Args4jOption }
 
 /** Arguments for accepting a set of loci to restrict variant-calling to. */
-trait LociArgs {
+trait LociArgs
+  extends LociInput {
   @Args4jOption(
     name = "--loci",
     usage = "If set, loci to include. Either 'all' or 'contig[:start[-end]],contig[:start[-end]],…'",
@@ -17,7 +19,7 @@ trait LociArgs {
     name = "--loci-file",
     usage = "Path to file giving loci to include.",
     forbids = Array("--loci"),
-    handler = classOf[StringOptionHandler]
+    handler = classOf[PathOptionHandler]
   )
-  var lociFileOpt: Option[String] = None
+  var lociFileOpt: Option[Path] = None
 }

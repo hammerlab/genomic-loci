@@ -1,17 +1,14 @@
 package org.hammerlab.genomics.loci.parsing
 
-import java.io.File
-
 import htsjdk.variant.vcf.VCFFileReader
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
 import org.hammerlab.genomics.loci.VariantContext
 import org.hammerlab.genomics.loci.args.LociArgs
 import org.hammerlab.genomics.reference.ContigName.Factory
+import org.hammerlab.paths.Path
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
-import scala.io.Source
 
 /**
  * Representation of genomic-loci ranges that may be used to instantiate a [[org.hammerlab.genomics.loci.set.LociSet]].
@@ -41,13 +38,13 @@ object ParsedLoci {
   def apply(lines: Iterator[String])(implicit factory: Factory): ParsedLoci = {
     val lociRanges = ArrayBuffer[LociRange]()
     for {
-      lociStrs <- lines
-      lociStr <- lociStrs.replaceAll("\\s", "").split(",")
-      lociRange <- ParsedLociRange(lociStr)
+      lociStrs ← lines
+      lociStr ← lociStrs.replaceAll("\\s", "").split(",")
+      lociRange ← ParsedLociRange(lociStr)
     } {
       lociRange match {
-        case AllRange => return All
-        case lociRange: LociRange =>
+        case AllRange ⇒ return All
+        case lociRange: LociRange ⇒
           lociRanges += lociRange
       }
     }
@@ -59,15 +56,16 @@ object ParsedLoci {
    * (lociFileOpt), and return a [[ParsedLoci]] encapsulating the result. The latter can then be converted into a
    * [[org.hammerlab.genomics.loci.set.LociSet]] when contig-lengths are available / have been parsed from read-sets.
    */
-  def fromArgs(args: LociArgs, hadoopConfiguration: Configuration): Option[ParsedLoci] =
-    fromArgs(args.lociStrOpt, args.lociFileOpt, hadoopConfiguration)
+  def apply(args: LociArgs,
+            hadoopConfiguration: Configuration): Option[ParsedLoci] =
+    apply(args.lociStrOpt, args.lociFileOpt, hadoopConfiguration)
 
-  def fromArgs(lociStrOpt: Option[String],
-               lociFileOpt: Option[String],
-               hadoopConfiguration: Configuration)(implicit factory: Factory): Option[ParsedLoci] =
+  def apply(lociStrOpt: Option[String],
+            lociFileOpt: Option[Path],
+            hadoopConfiguration: Configuration)(implicit factory: Factory): Option[ParsedLoci] =
     (lociStrOpt, lociFileOpt) match {
       case (Some(lociStr), _) => Some(ParsedLoci(lociStr))
-      case (_, Some(lociFile)) => Some(loadFromFile(lociFile, hadoopConfiguration))
+      case (_, Some(lociPath)) => Some(loadFromPath(lociPath, hadoopConfiguration))
       case _ =>
         None
     }
@@ -75,24 +73,21 @@ object ParsedLoci {
   /**
    * Parse loci from the specified file.
    *
-   * @param lociFile path to file containing loci. If it ends in '.vcf' then it is read as a VCF and the variant sites
+   * @param path path to file containing loci. If it ends in '.vcf' then it is read as a VCF and the variant sites
    *                 are the loci. If it ends in '.loci' or '.txt' then it should be a file containing loci as
    *                 "chrX:5-10,chr12-10-20", etc. Whitespace is ignored.
    * @return parsed loci
    */
-  private def loadFromFile(lociFile: String, hadoopConfiguration: Configuration)(implicit factory: Factory): ParsedLoci =
-    if (lociFile.endsWith(".vcf")) {
-      LociRanges.fromVCF(lociFile)
-    } else if (lociFile.endsWith(".loci") || lociFile.endsWith(".txt")) {
-      val path = new Path(lociFile)
-      val filesystem = path.getFileSystem(hadoopConfiguration)
-      val is = filesystem.open(path)
-      val lines = Source.fromInputStream(is).getLines()
-      ParsedLoci(lines)
-    } else
-      throw new IllegalArgumentException(
-        s"Couldn't guess format for file: $lociFile. Expected file extensions: '.loci' or '.txt' for loci string format; '.vcf' for VCFs."
-      )
+  private def loadFromPath(path: Path,
+                           hadoopConfiguration: Configuration)(implicit factory: Factory): ParsedLoci =
+    path.extension match {
+      case "vcf" ⇒ LociRanges.fromVCF(path)
+      case "loci" | "txt" ⇒ ParsedLoci(path.lines)
+      case _ ⇒
+        throw new IllegalArgumentException(
+          s"Couldn't guess format for file: $path. Expected file extensions: '.loci' or '.txt' for loci string format; '.vcf' for VCFs."
+        )
+    }
 }
 
 /**
@@ -105,11 +100,11 @@ case class LociRanges(ranges: Iterable[LociRange]) extends AnyVal with ParsedLoc
 object LociRanges {
   def apply(range: LociRange): LociRanges = apply(Iterable(range))
 
-  def fromVCF(lociFile: String): LociRanges =
+  def fromVCF(path: Path): LociRanges =
     apply(
       // VCF-reading currently only works for local files, requires "file://" scheme to not be present.
       // TODO: use hadoop-bam to load VCF from local filesystem or HDFS.
-      new VCFFileReader(new File(lociFile), false)
+      new VCFFileReader(path.toFile, false)
         .map {
           case VariantContext(contigName, start, end) =>
             LociRange(contigName, start, end)
