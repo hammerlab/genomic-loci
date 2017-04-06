@@ -2,9 +2,9 @@ package org.hammerlab.genomics.loci.set
 
 import org.hammerlab.genomics.loci.parsing.ParsedLoci
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
-import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil, LenientContigNameConversions }
 import org.hammerlab.genomics.reference.test.LociConversions._
-import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci, PermissiveRegistrar }
+import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil, ContigNameConversions }
+import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci }
 import org.hammerlab.spark.test.suite.KryoSparkSuite
 
 import scala.collection.mutable
@@ -12,14 +12,13 @@ import scala.collection.mutable
 class LociSetSuite
   extends KryoSparkSuite(classOf[Registrar])
     with LociSetUtil
-    with LenientContigNameConversions
+    with ContigNameConversions
     with ClearContigNames
     with ContigLengthsUtil {
 
   // "loci set invariants" collects some LociSets
   register(
-    classOf[mutable.WrappedArray.ofRef[_]],
-    PermissiveRegistrar
+    classOf[mutable.WrappedArray.ofRef[_]]
   )
 
   def makeLociSet(str: String, lengths: (ContigName, NumLoci)*): LociSet =
@@ -89,7 +88,7 @@ class LociSetSuite
         "with_dots.and_underscores..2:100-200",
         "21:300-400",
         "X:5-17,X:19-22,Y:50-60",
-        "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120"
+        "21:100-200,20:0-10,20:8-15,20:100-120"
       )
       .map(lociSet)
 
@@ -115,17 +114,17 @@ class LociSetSuite
 
   test("loci set parsing with contig lengths") {
     makeLociSet(
-      "chr1,chr2,17,chr2:3-5,chr20:10-20",
-      "chr1" -> 10,
-      "chr2" -> 20,
-      "17" -> 12,
-      "chr20" -> 5000
+      "chr1,chr2,chr17,chr2:3-5,chr20:10-20",
+      "chr1" → 10,
+      "chr2" → 20,
+      "chr17" → 12,
+      "chr20" → 5000
     )
-    .toString should ===("chr1:0-10,chr2:0-20,17:0-12,chr20:10-20")
+    .toString should ===("chr1:0-10,chr2:0-20,chr17:0-12,chr20:10-20")
   }
 
   test("parse half-open interval") {
-    makeLociSet("chr1:10000-", "chr1" -> 20000).toString should ===("chr1:10000-20000")
+    makeLociSet("chr1:10000-", "chr1" → 20000).toString should ===("chr1:10000-20000")
   }
 
   test("loci set single contig iterator basic") {
