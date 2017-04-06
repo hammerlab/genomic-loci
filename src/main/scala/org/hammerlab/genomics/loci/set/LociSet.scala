@@ -92,7 +92,7 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
     map
       .keys
       .flatMap(
-        contig =>
+        contig ⇒
           apply(contig)
             .ranges
             // We add 1 to the start to move to 1-based coordinates

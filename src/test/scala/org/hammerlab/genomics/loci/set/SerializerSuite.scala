@@ -22,8 +22,8 @@ class SerializerSuite
 
   import Helpers._
 
-  // "a closure that includes a LociSet" parallelizes some Range[Long]s.
   register(
+    // "a closure that includes a LociSet" parallelizes some Range[Long]s.
     classOf[Range],
     classOf[Array[Locus]],
 
@@ -67,18 +67,19 @@ class SerializerSuite
 
     val result =
       rdd
-        .map(Helpers.lociSetMapTask)
+        .map(mapTask)
         .collect
         .toSeq
 
     result should ===(sets.map(_("20").toString))
   }
 
+
   test("a closure that includes a LociSet") {
     val set: LociSet = "chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10"
     val setBC = sc.broadcast(set)
     val rdd = sc.parallelize[Locus]((0 until 1000).toSeq)
-    val result = rdd.filter(lociSetFilterTask(setBC)).collect
+    val result = rdd.filter(filterTask(setBC)).collect
     result should ===(100 until 200)
   }
 
@@ -99,7 +100,6 @@ class SerializerSuite
 
     loci2 should ===(loci)
   }
-
 }
 
 object Helpers {
@@ -109,14 +109,15 @@ object Helpers {
    * [[org.hammerlab.test.Suite]], which errors due to a non-serializable [[org.scalatest.Assertions]].AssertionsHelper
    * member inherited from [[org.scalatest.FunSuite]]. See https://github.com/scalatest/scalatest/issues/1013.
    */
-  def lociSetMapTask(set: LociSet): String = {
-    set("21").contains(5)
-    // no op
-    val _ = set("21").ranges // no op
-    set("20").toString
-  }
+  def mapTask(implicit factory: Factory) =
+    (set: LociSet) ⇒ {
+      set("21").contains(5)
+      // no op
+      val _ = set("21").ranges // no op
+      set("20").toString
+    }
 
-  def lociSetFilterTask(setBC: Broadcast[LociSet])(implicit factory: Factory) =
+  def filterTask(setBC: Broadcast[LociSet])(implicit factory: Factory) =
     (locus: Locus) ⇒
       setBC.value("chr21").contains(locus)
 }
