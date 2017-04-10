@@ -11,7 +11,7 @@ class ContigSerializer extends KryoSerializer[Contig] {
 
   def write(kryo: Kryo, output: Output, obj: Contig) = {
     kryo.writeObject(output, obj.name)
-    output.writeInt(obj.ranges.length)
+    output.writeInt(obj.numRanges)
     for {
       Interval(start, end) ← obj.ranges
     } {
@@ -22,16 +22,18 @@ class ContigSerializer extends KryoSerializer[Contig] {
 
   def read(kryo: Kryo, input: Input, klass: Class[Contig]): Contig = {
     val name = kryo.readObject(input, classOf[ContigName])
-    val length = input.readInt()
+    val numRanges = input.readInt()
     val treeRangeSet = TreeRangeSet.create[Locus]()
-    val ranges = (0 until length).foreach { _ ⇒
-      treeRangeSet.add(
-        closedOpen(
-          Locus(input.readLong()),
-          Locus(input.readLong())
+    val ranges =
+      (0 until numRanges).foreach { _ ⇒
+        treeRangeSet.add(
+          closedOpen(
+            Locus(input.readLong()),
+            Locus(input.readLong())
+          )
         )
-      )
-    }
+      }
+
     Contig(name, treeRangeSet)
   }
 }

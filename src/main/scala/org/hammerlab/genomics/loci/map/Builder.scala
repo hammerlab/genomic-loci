@@ -24,8 +24,8 @@ private[loci] class Builder[T] {
   /** Set the value for all loci in the given LociSet to the specified value in the LociMap under construction. */
   def put(loci: LociSet, value: T): Builder[T] = {
     for {
-      contig <- loci.contigs
-      Interval(start, end) <- contig.ranges
+      contig ← loci.contigs
+      Interval(start, end) ← contig.ranges
     } {
       put(contig.name, start, end, value)
     }

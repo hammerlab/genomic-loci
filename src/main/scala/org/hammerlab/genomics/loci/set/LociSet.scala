@@ -1,8 +1,9 @@
 package org.hammerlab.genomics.loci.set
 
-import htsjdk.samtools.util.{Interval => HTSJDKInterval}
-import org.hammerlab.genomics.loci.parsing.{All, LociRange, LociRanges, ParsedLoci}
-import org.hammerlab.genomics.reference.{ContigLengths, ContigName, Interval, Locus, NumLoci, Region}
+import htsjdk.samtools.util.{ Interval ⇒ HTSJDKInterval }
+import org.hammerlab.genomics.loci.parsing.{ All, LociRange, LociRanges, ParsedLoci }
+import org.hammerlab.genomics.reference.ContigName.Factory
+import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Interval, Locus, NumLoci, Region }
 import org.hammerlab.strings.TruncatedToString
 import org.scalautils.ConversionCheckedTripleEquals._
 
@@ -20,7 +21,8 @@ import scala.collection.immutable.TreeMap
  *
  * @param map A map from contig-name to Contig, which is a set or genomic intervals as described above.
  */
-case class LociSet(private val map: SortedMap[ContigName, Contig]) extends TruncatedToString {
+case class LociSet(private val map: SortedMap[ContigName, Contig])
+  extends TruncatedToString {
 
   /** The contigs included in this LociSet with a nonempty set of loci. */
   @transient lazy val contigs = map.values.toArray
@@ -97,7 +99,7 @@ case class LociSet(private val map: SortedMap[ContigName, Contig]) extends Trunc
             .ranges
             // We add 1 to the start to move to 1-based coordinates
             // Since the `Interval` end is inclusive, we are adding and subtracting 1, no-op
-            .map(interval =>
+            .map(interval ⇒
               new HTSJDKInterval(
                 contig.name,
                 interval.start.locus.toInt + 1,
@@ -114,9 +116,6 @@ object LociSet {
 
   def all(contigLengths: ContigLengths) = LociSet(All, contigLengths)
 
-  // NOTE(ryan): only used in tests; TODO: move to test-specific helper.
-//  def apply(lociStr: String): LociSet = ParsedLoci(lociStr).result
-
   /**
    * These constructors build a LociSet directly from Contigs.
    *
@@ -128,48 +127,48 @@ object LociSet {
       TreeMap(
         contigs
           .filterNot(_.isEmpty)
-          .map(contig => contig.name -> contig)
+          .map(contig ⇒ contig.name → contig)
           .toSeq: _*
       )
     )
 
-  def apply(regions: Iterable[Region]): LociSet =
+  def apply(regions: Iterable[Region])(implicit f: Factory): LociSet =
     LociSet.fromContigs(
       (for {
-        Region(contigName, start, end) <- regions
+        Region(contigName, start, end) ← regions
         if start != end
         range = Interval(start, end)
       } yield
-        contigName -> range
+        contigName → range
       )
       .groupBy(_._1)
       .mapValues(_.map(_._2))
       .map(Contig(_))
     )
 
-  def apply(loci: ParsedLoci, contigLengths: ContigLengths): LociSet =
+  def apply(loci: ParsedLoci, contigLengths: ContigLengths)(implicit f: Factory): LociSet =
     LociSet(
       loci match {
-        case All =>
+        case All ⇒
           for {
-            (contig, length) <- contigLengths
+            (contig, length) ← contigLengths
           } yield
             Region(contig, Locus(0), Locus(length))
-        case LociRanges(ranges) =>
+        case LociRanges(ranges) ⇒
           for {
-            LociRange(contigName, start, endOpt) <- ranges
+            LociRange(contigName, start, endOpt) ← ranges
             contigLengthOpt = contigLengths.get(contigName)
           } yield
             (endOpt, contigLengthOpt) match {
-              case (Some(end), Some(contigLength)) if end > Locus(contigLength) =>
+              case (Some(end), Some(contigLength)) if end > Locus(contigLength) ⇒
                 throw new IllegalArgumentException(
                   s"Invalid range $start-${endOpt.get} for contig '$contigName' which has length $contigLength"
                 )
-              case (Some(end), _) =>
+              case (Some(end), _) ⇒
                 Region(contigName, start, end)
-              case (_, Some(contigLength)) =>
+              case (_, Some(contigLength)) ⇒
                 Region(contigName, start, Locus(contigLength))
-              case _ =>
+              case _ ⇒
                 throw new IllegalArgumentException(
                   s"No such contig: $contigName. Valid contigs: ${contigLengths.keys.mkString(", ")}"
                 )

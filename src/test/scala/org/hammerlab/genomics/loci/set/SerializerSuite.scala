@@ -5,9 +5,9 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream,
 import org.apache.spark.broadcast.Broadcast
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.ContigName.Factory
-import org.hammerlab.genomics.reference.{ Locus, PermissiveRegistrar }
-import org.hammerlab.genomics.reference.test.{ ClearContigNames, LenientContigNameConversions }
 import org.hammerlab.genomics.reference.test.LociConversions._
+import org.hammerlab.genomics.reference.test.{ ClearContigNames, LenientContigNameConversions }
+import org.hammerlab.genomics.reference.{ Locus, PermissiveRegistrar }
 import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 
 import scala.collection.mutable
