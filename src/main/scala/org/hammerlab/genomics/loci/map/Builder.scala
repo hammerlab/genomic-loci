@@ -10,6 +10,9 @@ import scala.collection.mutable.ArrayBuffer
 private[loci] class Builder[T] {
   private val data = new mutable.HashMap[ContigName, ArrayBuffer[(Locus, Locus, T)]]()
 
+  def +=(contig: ContigName, start: Locus, end: Locus, value: T): Builder[T] =
+    put(contig, start, end, value)
+
   /** Set the value at the given locus range in the LociMap under construction. */
   def put(contig: ContigName, start: Locus, end: Locus, value: T): Builder[T] = {
     assume(end >= start)
