@@ -15,7 +15,7 @@ deps ++= Seq(
   string_utils % "1.2.0"
 )
 
-compileAndTestDeps += reference % "1.3.1-SNAPSHOT"
+compileAndTestDeps += reference % "1.4.0-SNAPSHOT"
 
 // Shade Guava due to use of RangeSet classes from 16.0.1 that don't exist in Spark/Hadoop's Guava 11.0.2.
 shadedDeps += guava
