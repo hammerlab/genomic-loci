@@ -1,21 +1,21 @@
 
 organization := "org.hammerlab.genomics"
 name := "loci"
-version := "2.0.0-SNAPSHOT"
+version := "2.0.0"
 
 addSparkDeps
 
 deps ++= Seq(
   args4j,
-  args4s % "1.2.3",
+  "org.hammerlab" ^^ "args4s" ^ "1.3.0",
   htsjdk,
-  iterators % "1.3.0-SNAPSHOT",
-  paths % "1.1.1-SNAPSHOT",
+  iterators % "1.3.0",
+  paths % "1.2.0",
   scalautils,
   string_utils % "1.2.0"
 )
 
-compileAndTestDeps += reference % "1.4.0-SNAPSHOT"
+compileAndTestDeps += reference % "1.4.0"
 
 // Shade Guava due to use of RangeSet classes from 16.0.1 that don't exist in Spark/Hadoop's Guava 11.0.2.
 shadedDeps += guava
