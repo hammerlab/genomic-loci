@@ -195,7 +195,7 @@ class LociSetSuite
         set
       )
     )
-    
+
     set.take(200) should be(
       (
         lociSet("chr1:100-200,chr2:30-40,chr3:50-51,chr4:1000-1089"),
