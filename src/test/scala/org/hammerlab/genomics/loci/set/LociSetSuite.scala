@@ -178,4 +178,29 @@ class LociSetSuite
     iter3.next() should ===(100000000000L - 1)
     iter3.hasNext should ===(false)
   }
+
+  test("take") {
+    val set = lociSet("chr1:100-200,chr2:30-40,chr3:50-51,chr4:1000-1100")
+
+    set.take(10) should be(
+      (
+        lociSet("chr1:100-110"),
+        lociSet("chr1:110-200,chr2:30-40,chr3:50-51,chr4:1000-1100")
+      )
+    )
+
+    set.take(0) should be(
+      (
+        lociSet(""),
+        set
+      )
+    )
+    
+    set.take(200) should be(
+      (
+        lociSet("chr1:100-200,chr2:30-40,chr3:50-51,chr4:1000-1089"),
+        lociSet("chr4:1089-1100")
+      )
+    )
+  }
 }
