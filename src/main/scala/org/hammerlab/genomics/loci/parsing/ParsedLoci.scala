@@ -1,7 +1,6 @@
 package org.hammerlab.genomics.loci.parsing
 
 import htsjdk.variant.vcf.VCFFileReader
-import org.apache.hadoop.conf.Configuration
 import org.hammerlab.genomics.loci.VariantContext
 import org.hammerlab.genomics.loci.args.LociArgs
 import org.hammerlab.genomics.reference.ContigName.Factory
@@ -56,16 +55,17 @@ object ParsedLoci {
    * (lociFileOpt), and return a [[ParsedLoci]] encapsulating the result. The latter can then be converted into a
    * [[org.hammerlab.genomics.loci.set.LociSet]] when contig-lengths are available / have been parsed from read-sets.
    */
-  def apply(args: LociArgs,
-            hadoopConfiguration: Configuration): Option[ParsedLoci] =
-    apply(args.lociStrOpt, args.lociFileOpt, hadoopConfiguration)
+  def apply(args: LociArgs): Option[ParsedLoci] =
+    apply(
+      args.lociStrOpt,
+      args.lociFileOpt
+    )
 
   def apply(lociStrOpt: Option[String],
-            lociFileOpt: Option[Path],
-            hadoopConfiguration: Configuration)(implicit factory: Factory): Option[ParsedLoci] =
+            lociFileOpt: Option[Path])(implicit factory: Factory): Option[ParsedLoci] =
     (lociStrOpt, lociFileOpt) match {
       case (Some(lociStr), _) => Some(ParsedLoci(lociStr))
-      case (_, Some(lociPath)) => Some(loadFromPath(lociPath, hadoopConfiguration))
+      case (_, Some(lociPath)) => Some(loadFromPath(lociPath))
       case _ =>
         None
     }
@@ -78,8 +78,7 @@ object ParsedLoci {
    *                 "chrX:5-10,chr12-10-20", etc. Whitespace is ignored.
    * @return parsed loci
    */
-  private def loadFromPath(path: Path,
-                           hadoopConfiguration: Configuration)(implicit factory: Factory): ParsedLoci =
+  private def loadFromPath(path: Path)(implicit factory: Factory): ParsedLoci =
     path.extension match {
       case "vcf" ⇒ LociRanges.fromVCF(path)
       case "loci" | "txt" ⇒ ParsedLoci(path.lines)

@@ -1,6 +1,5 @@
 package org.hammerlab.genomics.loci.parsing
 
-import org.apache.hadoop.conf.Configuration
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.test.ClearContigNames
 import org.hammerlab.genomics.reference.test.LociConversions.intToLocus
@@ -12,16 +11,13 @@ class ParsedLociSuite
     with ClearContigNames
     with LociSetUtil {
 
-  val conf = new Configuration
-
   // Loci-from-VCF sanity check.
   test("vcf loading") {
     val loci =
       lociSet(
         ParsedLoci(
           lociStrOpt = None,
-          lociFileOpt = Some(File("truth.chr20.vcf").path),
-          conf
+          lociFileOpt = Some(File("truth.chr20.vcf").path)
         ).get
       )
 

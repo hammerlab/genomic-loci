@@ -1,28 +1,28 @@
 
 organization := "org.hammerlab.genomics"
 name := "loci"
-version := "1.5.8"
+version := "2.0.0"
 
 addSparkDeps
 
 deps ++= Seq(
-  libs.value('args4j),
-  libs.value('args4s),
-  libs.value('htsjdk),
-  libs.value('iterators),
-  libs.value('paths),
-  libs.value('scalautils),
-  libs.value('string_utils)
+  args4j,
+  "org.hammerlab" ^^ "args4s" ^ "1.3.0",
+  htsjdk,
+  iterators % "1.3.0",
+  paths % "1.2.0",
+  scalautils,
+  string_utils % "1.2.0"
 )
 
-compileAndTestDeps += libs.value('reference)
+compileAndTestDeps += reference % "1.4.0"
 
 // Shade Guava due to use of RangeSet classes from 16.0.1 that don't exist in Spark/Hadoop's Guava 11.0.2.
-shadedDeps += "com.google.guava" % "guava" % "19.0"
+shadedDeps += guava
 
 // Rename shaded Guava classes.
-shadeRenames += "com.google.common.**" -> "org.hammerlab.guava.@1"
-shadeRenames += "com.google.thirdparty.**" -> "org.hammerlab.guava.@1"
+shadeRenames += "com.google.common.**" → "org.hammerlab.guava.@1"
+shadeRenames += "com.google.thirdparty.**" → "org.hammerlab.guava.@1"
 
 // Publish JAR that includes shaded Guava.
 publishThinShadedJar
