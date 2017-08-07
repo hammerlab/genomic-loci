@@ -1,7 +1,7 @@
 
 organization := "org.hammerlab.genomics"
 name := "loci"
-version := "2.0.0"
+version := "2.0.1"
 
 addSparkDeps
 
@@ -20,7 +20,7 @@ compileAndTestDeps += reference % "1.4.0"
 // Shade Guava due to use of RangeSet classes from 16.0.1 that don't exist in Spark/Hadoop's Guava 11.0.2.
 shadedDeps += guava
 
-// Rename shaded Guava classes.
+// Rename shaded Guava classes
 shadeRenames += "com.google.common.**" → "org.hammerlab.guava.@1"
 shadeRenames += "com.google.thirdparty.**" → "org.hammerlab.guava.@1"
 
