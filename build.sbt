@@ -7,7 +7,7 @@ addSparkDeps
 
 deps ++= Seq(
   args4j,
-  "org.hammerlab" ^^ "args4s" ^ "1.3.0",
+  args4s % "1.3.0",
   htsjdk,
   iterators % "1.3.0",
   paths % "1.2.0",
