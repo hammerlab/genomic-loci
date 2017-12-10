@@ -1,5 +1,7 @@
 package org.hammerlab.genomics.loci.set
 
+import com.esotericsoftware.kryo.io.{ Input, Output }
+import com.esotericsoftware.kryo.{ Kryo, Serializer }
 import htsjdk.samtools.util.{ Interval ⇒ HTSJDKInterval }
 import org.hammerlab.genomics.loci.parsing.{ All, LociRange, LociRanges, ParsedLoci }
 import org.hammerlab.genomics.reference.ContigName.Factory
@@ -175,4 +177,20 @@ object LociSet {
             }
       }
     )
+
+  // We just serialize the underlying contigs, which contain their names which are the string keys of LociSet.map.
+  implicit val serializer =
+    new Serializer[LociSet] {
+      def write(kryo: Kryo, output: Output, obj: LociSet) = {
+        kryo.writeObject(output, obj.contigs)
+      }
+
+      def read(kryo: Kryo, input: Input, klass: Class[LociSet]): LociSet = {
+        val contigs = kryo.readObject(input, classOf[Array[Contig]])
+        LociSet.fromContigs(contigs)
+      }
+    }
+
+  import org.hammerlab.kryo._
+  implicit val alsoRegister = AlsoRegister[LociSet](arr[Contig])
 }

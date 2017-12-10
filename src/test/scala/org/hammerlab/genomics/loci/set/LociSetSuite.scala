@@ -6,11 +6,12 @@ import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil, ContigNameConversions }
 import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci }
 import org.hammerlab.spark.test.suite.KryoSparkSuite
+import org.hammerlab.kryo._
 
 import scala.collection.mutable
 
 class LociSetSuite
-  extends KryoSparkSuite(classOf[Registrar])
+  extends KryoSparkSuite
     with LociSetUtil
     with ContigNameConversions
     with ClearContigNames
@@ -18,6 +19,7 @@ class LociSetSuite
 
   // "loci set invariants" collects some LociSets
   register(
+    arr[LociSet],
     classOf[mutable.WrappedArray.ofRef[_]]
   )
 

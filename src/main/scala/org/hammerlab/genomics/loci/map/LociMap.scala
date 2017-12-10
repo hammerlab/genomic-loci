@@ -94,4 +94,9 @@ object LociMap {
         contigs.map(contig => contig.name -> contig).toSeq: _*
       )
     )
+
+  import com.esotericsoftware.kryo
+  import org.hammerlab.kryo._
+  implicit val serializer: kryo.Serializer[LociMap[Nothing]] = new Serializer[Nothing]
+  implicit val alsoRegister = AlsoRegister[LociMap[Nothing]](arr[Contig[Nothing]])
 }
