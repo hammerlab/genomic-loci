@@ -2,6 +2,8 @@ organization := "org.hammerlab.genomics"
 name := "loci"
 r"2.0.1"
 
+github.repo("genomic-loci")
+
 addSparkDeps
 
 dep(
