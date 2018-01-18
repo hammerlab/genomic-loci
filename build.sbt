@@ -1,6 +1,5 @@
 organization := "org.hammerlab.genomics"
 name := "loci"
-v"2.0.2"
 
 github.repo("genomic-loci")
 
