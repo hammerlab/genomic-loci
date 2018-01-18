@@ -6,9 +6,13 @@ import org.hammerlab.genomics.reference.{ ContigName, Locus }
 import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 
 class SerializerSuite
-  extends KryoSparkSuite(classOf[Registrar])
+  extends KryoSparkSuite
     with SparkSerialization
     with ClearContigNames {
+
+  register(
+    classOf[LociMap[Nothing]]
+  )
 
   def check(
     ranges: (ContigName, Locus, Locus, String)*

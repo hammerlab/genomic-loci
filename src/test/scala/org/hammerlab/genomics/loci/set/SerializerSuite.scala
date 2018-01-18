@@ -8,12 +8,13 @@ import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.genomics.reference.test.{ ClearContigNames, LenientContigNameConversions }
 import org.hammerlab.genomics.reference.{ Locus, PermissiveRegistrar }
+import org.hammerlab.kryo._
 import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 
 import scala.collection.mutable
 
 class SerializerSuite
-  extends KryoSparkSuite(classOf[Registrar], referenceTracking = true)
+  extends KryoSparkSuite(referenceTracking = true)
     with SparkSerialization
     with LenientContigNameConversions
     with ClearContigNames
@@ -23,14 +24,16 @@ class SerializerSuite
   import Helpers._
 
   register(
+    arr[LociSet],
+
     // "a closure that includes a LociSet" parallelizes some Range[Long]s.
-    classOf[Range],
-    classOf[Array[Locus]],
+    cls[Range],
+    cls[Array[Locus]],
 
     // "make an RDD[LociSet] and an RDD[Contig]" collects some Strings.
-    classOf[Array[String]],
+    cls[Array[String]],
 
-    classOf[mutable.WrappedArray.ofRef[_]],
+    cls[mutable.WrappedArray.ofRef[_]],
 
     PermissiveRegistrar
   )

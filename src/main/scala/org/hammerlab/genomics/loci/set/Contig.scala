@@ -113,4 +113,8 @@ object Contig {
     )
 
   def lociRange(start: Locus, end: Locus): JRange[Locus] = closedOpen[Locus](start, end)
+
+  import org.hammerlab.kryo._
+  implicit val serializer = new ContigSerializer
+  implicit val alsoRegister = AlsoRegister[Contig](cls[ContigName])
 }

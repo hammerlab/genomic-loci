@@ -6,7 +6,7 @@ import com.google.common.collect.{ TreeRangeSet, Range ⇒ JRange }
 import JRange.closedOpen
 import org.hammerlab.genomics.reference.{ ContigName, Interval, Locus }
 
-// We serialize a LociSet simply by writing out its constituent Contigs.
+/** Serialize a [[LociSet]] simply by writing out its [[Contig]]s. */
 class ContigSerializer extends KryoSerializer[Contig] {
 
   def write(kryo: Kryo, output: Output, obj: Contig) = {
