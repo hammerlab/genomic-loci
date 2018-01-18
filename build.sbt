@@ -1,6 +1,6 @@
 organization := "org.hammerlab.genomics"
 name := "loci"
-r"2.0.1"
+v"2.0.2"
 
 github.repo("genomic-loci")
 
@@ -10,8 +10,8 @@ dep(
   args4j,
   args4s       % "1.3.0",
   htsjdk,
-  iterators    % "1.3.0",
-  paths        % "1.2.0",
+  iterators    % "2.0.0",
+  paths        % "1.4.0",
   reference    % "1.4.0" + testtest,
   scalautils,
   spark_util   % "2.0.1",

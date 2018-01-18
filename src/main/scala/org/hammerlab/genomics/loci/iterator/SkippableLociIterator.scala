@@ -1,9 +1,10 @@
 package org.hammerlab.genomics.loci.iterator
 
 import org.hammerlab.genomics.reference.Locus
-import org.hammerlab.iterator.SimpleBufferedIterator
+import hammerlab.iterator._
 
-abstract class SkippableLociIterator[T] extends SimpleBufferedIterator[T] {
+abstract class SkippableLociIterator[T]
+  extends SimpleIterator[T] {
 
   def locusFn: T => Locus
 
