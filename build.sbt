@@ -12,7 +12,7 @@ dep(
   htsjdk,
   iterators    % "2.0.0",
   paths        % "1.4.0",
-  reference    % "1.4.0" + testtest,
+  reference    % "1.4.1" + testtest,
   scalautils,
   spark_util   % "2.0.1",
   string_utils % "1.2.0"
