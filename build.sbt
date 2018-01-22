@@ -1,4 +1,4 @@
-organization := "org.hammerlab.genomics"
+group("org.hammerlab.genomics")
 name := "loci"
 
 github.repo("genomic-loci")
@@ -7,13 +7,13 @@ addSparkDeps
 
 dep(
   args4j,
-  args4s       % "1.3.0",
+  args4s       % "1.3.1",
   htsjdk,
   iterators    % "2.0.0",
   paths        % "1.4.0",
-  reference    % "1.4.1" + testtest,
+  reference    % "1.4.2" + testtest,
   scalautils,
-  spark_util   % "2.0.1",
+  spark_util   % "2.0.2",
   string_utils % "1.2.0"
 )
 
