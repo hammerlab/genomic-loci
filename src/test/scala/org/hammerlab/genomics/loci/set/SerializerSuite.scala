@@ -109,7 +109,7 @@ object Helpers {
 
   /**
    * Isolate this method in its own object because otherwise ClosureCleaner will attempt to Java-serialize the enclosing
-   * [[org.hammerlab.test.Suite]], which errors due to a non-serializable [[org.scalatest.Assertions]].AssertionsHelper
+   * [[hammerlab.test.Suite]], which errors due to a non-serializable [[org.scalatest.Assertions]].AssertionsHelper
    * member inherited from [[org.scalatest.FunSuite]]. See https://github.com/scalatest/scalatest/issues/1013.
    */
   def mapTask(implicit factory: Factory) =

@@ -1,19 +1,20 @@
 group("org.hammerlab.genomics")
 name := "loci"
-
-github.repo("genomic-loci")
+v"2.0.3"
 
 addSparkDeps
 
+import genomics.reference
+
 dep(
-  args4j,
-  args4s       % "1.3.1",
-  htsjdk,
-  iterators    % "2.0.0",
-  paths        % "1.4.0",
-  reference    % "1.4.2" + testtest,
-  scalautils,
-  spark_util   % "2.0.2",
+        args4j,
+        args4s % "1.3.1",
+        htsjdk,
+     iterators % "2.1.0",
+         paths % "1.5.0",
+     reference % "1.4.3" + testtest,
+    scalautils,
+    spark_util % "2.0.3",
   string_utils % "1.2.0"
 )
 
@@ -28,3 +29,5 @@ shadeRenames += "com.google.thirdparty.**" → "org.hammerlab.guava.@1"
 publishThinShadedJar
 
 publishTestJar
+
+github.repo("genomic-loci")
