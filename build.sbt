@@ -1,6 +1,6 @@
 group("org.hammerlab.genomics")
 name := "loci"
-v"2.0.3"
+v"2.0.4"
 
 addSparkDeps
 
