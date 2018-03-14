@@ -1,9 +1,9 @@
 package org.hammerlab.genomics.loci.iterator
 
+import hammerlab.test.Suite
 import org.hammerlab.genomics.reference.test.IntervalsUtil
 import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.genomics.reference.{ Interval, Locus }
-import org.hammerlab.test.Suite
 
 class SkippableLociIteratorSuite
   extends Suite

@@ -1,9 +1,9 @@
 package org.hammerlab.genomics.loci.parsing
 
+import hammerlab.test.Suite
 import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.test.ClearContigNames
 import org.hammerlab.genomics.reference.test.LociConversions.intToLocus
-import org.hammerlab.test.Suite
 import org.hammerlab.test.resources.File
 
 class ParsedLociSuite
