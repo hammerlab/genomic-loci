@@ -15,12 +15,11 @@ class ParsedLociSuite
   test("vcf loading") {
     val loci =
       lociSet(
-        ParsedLoci(
-          lociStrOpt = None,
-          lociFileOpt = Some(File("truth.chr20.vcf").path)
-        ).get
+        ParsedLoci.loadFromPath(
+          File("truth.chr20.vcf")
+        )
       )
 
-    loci.count should ===(743606)
+    ==(loci.count, 743606)
   }
 }

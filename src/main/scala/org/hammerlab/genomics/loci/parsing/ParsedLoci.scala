@@ -2,7 +2,6 @@ package org.hammerlab.genomics.loci.parsing
 
 import htsjdk.variant.vcf.VCFFileReader
 import org.hammerlab.genomics.loci.VariantContext
-import org.hammerlab.genomics.loci.args.LociArgs
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.paths.Path
 
@@ -20,7 +19,7 @@ import scala.collection.mutable.ArrayBuffer
  * The two implementations are:
  *
  *   - [[All]]: sentinel value representing all loci on all contigs.
- *   - [[LociRanges]]: a sequence of [[LociRange]]s denoting (possibly open-ended) genomic-intervals.
+ *   - [[LociRanges]]: a sequence of [[Range]]s denoting (possibly open-ended) genomic-intervals.
  *
  * Examples:
  *
@@ -35,40 +34,20 @@ object ParsedLoci {
   def apply(lociStrs: String)(implicit factory: Factory): ParsedLoci = apply(Iterator(lociStrs))
 
   def apply(lines: Iterator[String])(implicit factory: Factory): ParsedLoci = {
-    val lociRanges = ArrayBuffer[LociRange]()
+    val lociRanges = ArrayBuffer[Range]()
     for {
       lociStrs ← lines
       lociStr ← lociStrs.replaceAll("\\s", "").split(",")
-      lociRange ← ParsedLociRange(lociStr)
+      lociRange ← ParsedRange(lociStr)
     } {
       lociRange match {
-        case AllRange ⇒ return All
-        case lociRange: LociRange ⇒
+        case ParsedRange.All ⇒ return All
+        case lociRange: Range ⇒
           lociRanges += lociRange
       }
     }
     LociRanges(lociRanges)
   }
-
-  /**
-   * Parse string representations of loci ranges, either from one string (lociOpt) or a file with one range per line
-   * (lociFileOpt), and return a [[ParsedLoci]] encapsulating the result. The latter can then be converted into a
-   * [[org.hammerlab.genomics.loci.set.LociSet]] when contig-lengths are available / have been parsed from read-sets.
-   */
-  def apply(args: LociArgs): Option[ParsedLoci] =
-    apply(
-      args.lociStrOpt,
-      args.lociFileOpt
-    )
-
-  def apply(lociStrOpt: Option[String],
-            lociFileOpt: Option[Path])(implicit factory: Factory): Option[ParsedLoci] =
-    (lociStrOpt, lociFileOpt) match {
-      case (Some(lociStr), _) => Some(ParsedLoci(lociStr))
-      case (_, Some(lociPath)) => Some(loadFromPath(lociPath))
-      case _ =>
-        None
-    }
 
   /**
    * Parse loci from the specified file.
@@ -78,7 +57,7 @@ object ParsedLoci {
    *                 "chrX:5-10,chr12-10-20", etc. Whitespace is ignored.
    * @return parsed loci
    */
-  private def loadFromPath(path: Path)(implicit factory: Factory): ParsedLoci =
+  def loadFromPath(path: Path)(implicit factory: Factory): ParsedLoci =
     path.extension match {
       case "vcf" ⇒ LociRanges.fromVCF(path)
       case "loci" | "txt" ⇒ ParsedLoci(path.lines)
@@ -94,10 +73,10 @@ object ParsedLoci {
  */
 case object All extends ParsedLoci
 
-case class LociRanges(ranges: Iterable[LociRange]) extends AnyVal with ParsedLoci
+case class LociRanges(ranges: Iterable[Range]) extends AnyVal with ParsedLoci
 
 object LociRanges {
-  def apply(range: LociRange): LociRanges = apply(Iterable(range))
+  def apply(range: Range): LociRanges = apply(Iterable(range))
 
   def fromVCF(path: Path): LociRanges =
     apply(
@@ -106,7 +85,7 @@ object LociRanges {
       new VCFFileReader(path.toFile, false)
         .map {
           case VariantContext(contigName, start, end) =>
-            LociRange(contigName, start, end)
+            Range(contigName, start, end)
         }
     )
 }

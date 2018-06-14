@@ -19,7 +19,8 @@ class SerializerSuite
     with LenientContigNameConversions
     with ClearContigNames
     with LociSetUtil
-    with Serializable {
+    with Serializable
+    with cmps {
 
   import Helpers._
 
@@ -52,7 +53,7 @@ class SerializerSuite
 
     val rdd = sc.parallelize(sets)
     val result = rdd.map(_.toString).collect.toSeq
-    result should ===(sets.map(_.toString))
+    ==(result, sets.map(_.toString))
   }
 
   test("make an RDD[LociSet], and an RDD[Contig]") {
@@ -74,7 +75,7 @@ class SerializerSuite
         .collect
         .toSeq
 
-    result should ===(sets.map(_("20").toString))
+    ==(result, sets.map(_("20").toString))
   }
 
 
@@ -83,7 +84,7 @@ class SerializerSuite
     val setBC = sc.broadcast(set)
     val rdd = sc.parallelize[Locus]((0 until 1000).toSeq)
     val result = rdd.filter(filterTask(setBC)).collect
-    result should ===(100 until 200)
+    ==(result, 100 until 200)
   }
 
   test("java serialization") {
@@ -101,7 +102,7 @@ class SerializerSuite
 
     val loci2 = ois.readObject().asInstanceOf[LociSet]
 
-    loci2 should ===(loci)
+    ==(loci2, loci)
   }
 }
 

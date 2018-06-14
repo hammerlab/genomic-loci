@@ -3,7 +3,7 @@ package org.hammerlab.genomics.loci.set
 import com.esotericsoftware.kryo.io.{ Input, Output }
 import com.esotericsoftware.kryo.{ Kryo, Serializer }
 import htsjdk.samtools.util.{ Interval ⇒ HTSJDKInterval }
-import org.hammerlab.genomics.loci.parsing.{ All, LociRange, LociRanges, ParsedLoci }
+import org.hammerlab.genomics.loci.parsing.{ All, Range, LociRanges, ParsedLoci }
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Interval, Locus, NumLoci, Region }
 import org.hammerlab.strings.TruncatedToString
@@ -158,7 +158,7 @@ object LociSet {
             Region(contig, Locus(0), Locus(length))
         case LociRanges(ranges) ⇒
           for {
-            LociRange(contigName, start, endOpt) ← ranges
+            Range(contigName, start, endOpt) ← ranges
             contigLengthOpt = contigLengths.get(contigName)
           } yield
             (endOpt, contigLengthOpt) match {
