@@ -5,8 +5,8 @@ import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil, ContigNameConversions }
 import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci }
-import org.hammerlab.spark.test.suite.KryoSparkSuite
 import org.hammerlab.kryo._
+import org.hammerlab.spark.test.suite.KryoSparkSuite
 
 import scala.collection.mutable
 
@@ -15,7 +15,8 @@ class LociSetSuite
     with LociSetUtil
     with ContigNameConversions
     with ClearContigNames
-    with ContigLengthsUtil {
+    with ContigLengthsUtil
+    with cmps {
 
   // "loci set invariants" collects some LociSets
   register(
@@ -29,56 +30,56 @@ class LociSetSuite
   test("properties of empty LociSet") {
     val empty = LociSet()
     empty.contigs should have size 0
-    empty.count should ===(0)
-    empty should ===(lociSet(""))
+    ==(empty.count, 0)
+    ==(empty, lociSet(""))
     val empty2 = lociSet("empty1:30-30,empty2:40-40")
-    empty should ===(empty2)
+    ==(empty, empty2)
   }
 
   test("count, containment, intersection testing of a loci set") {
     val set = lociSet("chr21:100-200,chr20:0-10,chr20:8-15,chr20:100-120,empty:10-10")
-    set.contigs.map(_.name) should ===(Seq("chr20", "chr21"))
-    set.count should ===(135)
-    set("chr20").contains(110) should ===(true)
-    set("chr20").contains(100) should ===(true)
-    set("chr20").contains(99) should ===(false)
-    set("chr20").contains(120) should ===(false)
-    set("chr20").contains(119) should ===(true)
-    set("chr20").count should ===(35)
-    set("chr20").intersects(0, 5) should ===(true)
-    set("chr20").intersects(0, 1) should ===(true)
-    set("chr20").intersects(0, 0) should ===(false)
-    set("chr20").intersects(7, 8) should ===(true)
-    set("chr20").intersects(9, 11) should ===(true)
-    set("chr20").intersects(11, 18) should ===(true)
-    set("chr20").intersects(18, 19) should ===(false)
-    set("chr20").intersects(14, 80) should ===(true)
-    set("chr20").intersects(15, 80) should ===(false)
-    set("chr20").intersects(120, 130) should ===(false)
-    set("chr20").intersects(119, 130) should ===(true)
+    ==(set.contigs.map(_.name), Seq("chr20", "chr21"))
+    ==(set.count, 135)
+    ==(set("chr20").contains(110), true)
+    ==(set("chr20").contains(100), true)
+    ==(set("chr20").contains(99), false)
+    ==(set("chr20").contains(120), false)
+    ==(set("chr20").contains(119), true)
+    ==(set("chr20").count, 35)
+    ==(set("chr20").intersects(0, 5), true)
+    ==(set("chr20").intersects(0, 1), true)
+    ==(set("chr20").intersects(0, 0), false)
+    ==(set("chr20").intersects(7, 8), true)
+    ==(set("chr20").intersects(9, 11), true)
+    ==(set("chr20").intersects(11, 18), true)
+    ==(set("chr20").intersects(18, 19), false)
+    ==(set("chr20").intersects(14, 80), true)
+    ==(set("chr20").intersects(15, 80), false)
+    ==(set("chr20").intersects(120, 130), false)
+    ==(set("chr20").intersects(119, 130), true)
 
-    set("chr21").contains(99) should ===(false)
-    set("chr21").contains(100) should ===(true)
-    set("chr21").contains(200) should ===(false)
-    set("chr21").count should ===(100)
-    set("chr21").intersects(110, 120) should ===(true)
-    set("chr21").intersects(90, 120) should ===(true)
-    set("chr21").intersects(150, 200) should ===(true)
-    set("chr21").intersects(150, 210) should ===(true)
-    set("chr21").intersects(200, 210) should ===(false)
-    set("chr21").intersects(201, 210) should ===(false)
-    set("chr21").intersects(90, 100) should ===(false)
-    set("chr21").intersects(90, 101) should ===(true)
-    set("chr21").intersects(90, 95) should ===(false)
-    set("chr21").iterator.toSeq should ===(100 until 200)
+    ==(set("chr21").contains(99), false)
+    ==(set("chr21").contains(100), true)
+    ==(set("chr21").contains(200), false)
+    ==(set("chr21").count, 100)
+    ==(set("chr21").intersects(110, 120), true)
+    ==(set("chr21").intersects(90, 120), true)
+    ==(set("chr21").intersects(150, 200), true)
+    ==(set("chr21").intersects(150, 210), true)
+    ==(set("chr21").intersects(200, 210), false)
+    ==(set("chr21").intersects(201, 210), false)
+    ==(set("chr21").intersects(90, 100), false)
+    ==(set("chr21").intersects(90, 101), true)
+    ==(set("chr21").intersects(90, 95), false)
+    ==(set("chr21").iterator.toSeq, 100 until 200)
   }
 
   test("single loci parsing") {
     val set = lociSet("chr1:10000")
-    set.count should ===(1)
-    set("chr1").contains( 9999) should ===(false)
-    set("chr1").contains(10000) should ===(true)
-    set("chr1").contains(10001) should ===(false)
+    ==(set.count, 1)
+    ==(set("chr1").contains( 9999), false)
+    ==(set("chr1").contains(10000), true)
+    ==(set("chr1").contains(10001), false)
   }
 
   test("loci set invariants") {
@@ -98,16 +99,16 @@ class LociSetSuite
       set should not be null
       set.toString should not be null
       withClue("invariants for: '%s'".format(set.toString)) {
-        lociSet(set.toString) should ===(set)
-        lociSet(set.toString).toString should ===(set.toString)
-        set should ===(set)
+        ==(lociSet(set.toString), set)
+        ==(lociSet(set.toString).toString, set.toString)
+        ==(set, set)
 
         // Test serialization. We hit all sorts of null pointer exceptions here at one point, so we are paranoid about
         // checking every pointer.
         val parallelized = sc.parallelize(List(set))
         val collected = parallelized.collect()
         val result = collected(0)
-        result should ===(set)
+        ==(result, set)
       }
     }
 
@@ -115,70 +116,73 @@ class LociSetSuite
   }
 
   test("loci set parsing with contig lengths") {
-    makeLociSet(
-      "chr1,chr2,chr17,chr2:3-5,chr20:10-20",
-      "chr1" → 10,
-      "chr2" → 20,
-      "chr17" → 12,
-      "chr20" → 5000
+    ==(
+      makeLociSet(
+        "chr1,chr2,chr17,chr2:3-5,chr20:10-20",
+        "chr1" → 10,
+        "chr2" → 20,
+        "chr17" → 12,
+        "chr20" → 5000
+      )
+      .toString,
+      "chr1:0-10,chr2:0-20,chr17:0-12,chr20:10-20"
     )
-    .toString should ===("chr1:0-10,chr2:0-20,chr17:0-12,chr20:10-20")
   }
 
   test("parse half-open interval") {
-    makeLociSet("chr1:10000-", "chr1" → 20000).toString should ===("chr1:10000-20000")
+    ==(makeLociSet("chr1:10000-", "chr1" → 20000).toString, "chr1:10000-20000")
   }
 
   test("loci set single contig iterator basic") {
     val set = lociSet("chr1:20-25,chr1:15-17,chr1:40-43,chr1:40-42,chr1:5-5,chr2:5-6,chr2:6-7,chr2:2-4")
-    set("chr1").iterator.toSeq should ===(Seq(15, 16, 20, 21, 22, 23, 24, 40, 41, 42))
-    set("chr2").iterator.toSeq should ===(Seq(2, 3, 5, 6))
+    ==(set("chr1").iterator.toSeq, Seq(15, 16, 20, 21, 22, 23, 24, 40, 41, 42))
+    ==(set("chr2").iterator.toSeq, Seq(2, 3, 5, 6))
 
     val iter1 = set("chr1").iterator
-    iter1.hasNext should ===(true)
-    iter1.head should ===(15)
-    iter1.next() should ===(15)
-    iter1.head should ===(16)
-    iter1.next() should ===(16)
-    iter1.head should ===(20)
-    iter1.next() should ===(20)
-    iter1.head should ===(21)
+    ==(iter1.hasNext, true)
+    ==(iter1.head, 15)
+    ==(iter1.next(), 15)
+    ==(iter1.head, 16)
+    ==(iter1.next(), 16)
+    ==(iter1.head, 20)
+    ==(iter1.next(), 20)
+    ==(iter1.head, 21)
     iter1.skipTo(23)
-    iter1.next() should ===(23)
-    iter1.head should ===(24)
+    ==(iter1.next(), 23)
+    ==(iter1.head, 24)
     iter1.skipTo(38)
-    iter1.head should ===(40)
-    iter1.hasNext should ===(true)
+    ==(iter1.head, 40)
+    ==(iter1.hasNext, true)
     iter1.skipTo(100)
-    iter1.hasNext should ===(false)
+    ==(iter1.hasNext, false)
   }
 
   test("loci set single contig iterator: test that skipTo implemented efficiently.") {
     val set = lociSet("chr1:2-3,chr1:10-15,chr1:100-100000000000")
 
     val iter1 = set("chr1").iterator
-    iter1.hasNext should ===(true)
-    iter1.head should ===(2)
-    iter1.next() should ===(2)
-    iter1.next() should ===(10)
-    iter1.next() should ===(11)
+    ==(iter1.hasNext, true)
+    ==(iter1.head, 2)
+    ==(iter1.next(), 2)
+    ==(iter1.next(), 10)
+    ==(iter1.next(), 11)
 
     val sixBillion = Locus(6000000000L)
     iter1.skipTo(sixBillion)  // will hang if it steps through each locus.
-    iter1.next() should ===(sixBillion)
-    iter1.next() should ===(sixBillion.next)
-    iter1.hasNext should ===(true)
+    ==(iter1.next(), sixBillion)
+    ==(iter1.next(), sixBillion.next)
+    ==(iter1.hasNext, true)
 
     val hundredBillion = Locus(100000000000L)
     val iter2 = set("chr1").iterator
     iter2.skipTo(hundredBillion)
-    iter2.hasNext should ===(false)
+    ==(iter2.hasNext, false)
 
     val iter3 = set("chr1").iterator
     iter3.skipTo(hundredBillion.prev)
-    iter3.hasNext should ===(true)
-    iter3.next() should ===(100000000000L - 1)
-    iter3.hasNext should ===(false)
+    ==(iter3.hasNext, true)
+    ==(iter3.next(), 100000000000L - 1)
+    ==(iter3.hasNext, false)
   }
 
   test("take") {

@@ -8,7 +8,8 @@ import org.hammerlab.spark.test.suite.{ KryoSparkSuite, SparkSerialization }
 class SerializerSuite
   extends KryoSparkSuite
     with SparkSerialization
-    with ClearContigNames {
+    with ClearContigNames
+    with cmps {
 
   register(
     classOf[LociMap[Nothing]]
@@ -23,15 +24,15 @@ class SerializerSuite
   ) = {
     val beforeMap = LociMap(ranges: _*)
 
-    beforeMap("chr1").asMap.size should ===(numRanges)
-    beforeMap("chr1").count should ===(count)
+    ==(beforeMap("chr1").asMap.size, numRanges)
+    ==(beforeMap("chr1").count, count)
 
     val bytes = serialize(beforeMap)
-    bytes.array.length should ===(expectedBytes)
+    ==(bytes.array.length, expectedBytes)
 
     val afterMap: LociMap[String] = deserialize[LociMap[String]](bytes)
 
-    beforeMap should ===(afterMap)
+    ==(beforeMap, afterMap)
   }
 
   test("empty") { check()(9, 0, 0) }

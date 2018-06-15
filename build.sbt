@@ -1,20 +1,18 @@
-group("org.hammerlab.genomics")
-name := "loci"
-v"2.0.4"
+subgroup("genomics", "loci")
+v"2.1.0"
 
-addSparkDeps
+spark
 
 import genomics.reference
 
 dep(
-        args4j,
-        args4s % "1.3.1",
+      case_app,
         htsjdk,
-     iterators % "2.1.0",
+     iterators % "2.2.0",
          paths % "1.5.0",
      reference % "1.4.3" + testtest,
     scalautils,
-    spark_util % "2.0.3",
+    spark_util % "2.0.4",
   string_utils % "1.2.0"
 )
 
@@ -22,7 +20,7 @@ dep(
 shadedDeps += guava
 
 // Rename shaded Guava classes
-shadeRenames += "com.google.common.**" → "org.hammerlab.guava.@1"
+shadeRenames += "com.google.common.**"     → "org.hammerlab.guava.@1"
 shadeRenames += "com.google.thirdparty.**" → "org.hammerlab.guava.@1"
 
 // Publish JAR that includes shaded Guava.

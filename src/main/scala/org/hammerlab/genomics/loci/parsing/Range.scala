@@ -14,9 +14,9 @@ import org.hammerlab.genomics.reference.{ ContigName, Locus }
  *   - all
  *   - none
  */
-sealed trait ParsedLociRange
+sealed trait ParsedRange
 
-object ParsedLociRange {
+object ParsedRange {
 
   val contigAndLoci = """^([\pL\pN._]+):(\pN+)(?:-(\pN*))?$""".r
   val contigOnly = """^([\pL\pN._]+)""".r
@@ -31,10 +31,10 @@ object ParsedLociRange {
    *  "chr1:10000": just chr1, position 10000; equivalent to "chr1:10000-10001".
    *  "chr1:10000-": chr1, from position 10000 to the end of chr1.
    */
-  def apply(lociRangeStr: String)(implicit factory: Factory): Option[ParsedLociRange] =
+  def apply(lociRangeStr: String)(implicit factory: Factory): Option[ParsedRange] =
     lociRangeStr.replaceAll("\\s", "") match {
       case "all" =>
-        Some(AllRange)
+        Some(All)
       case "none" | "" =>
         None
       case contigAndLoci(name, startStr, endStrOpt) =>
@@ -46,27 +46,28 @@ object ParsedLociRange {
             case None => Some(start.next)
           }
 
-        Some(LociRange(name, start, endOpt))
+        Some(Range(name, start, endOpt))
       case contigOnly(contig) =>
-        Some(LociRange(contig, Locus(0), None))
+        Some(Range(contig, Locus(0), None))
       case other =>
         throw new IllegalArgumentException(s"Couldn't parse loci range: $other")
     }
+
+  case object All extends ParsedRange
+
 }
 
-case object AllRange extends ParsedLociRange
+case class Range(contigName: ContigName,
+                 start: Locus,
+                 endOpt: Option[Locus])
+  extends ParsedRange
 
-case class LociRange(contigName: ContigName,
-                     start: Locus,
-                     endOpt: Option[Locus])
-  extends ParsedLociRange
+object Range {
+  def apply(contigName: ContigName, start: Locus, end: Locus): Range =
+    Range(contigName, start, Some(end))
 
-object LociRange {
-  def apply(contigName: ContigName, start: Locus, end: Locus): LociRange =
-    LociRange(contigName, start, Some(end))
-
-  def apply(tuple: (ContigName, Locus, Locus)): LociRange = {
+  def apply(tuple: (ContigName, Locus, Locus)): Range = {
     val (contigName, start, end) = tuple
-    LociRange(contigName, start, Some(end))
+    Range(contigName, start, Some(end))
   }
 }

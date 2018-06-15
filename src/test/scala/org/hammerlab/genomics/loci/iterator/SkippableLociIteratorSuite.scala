@@ -24,7 +24,8 @@ class SkippableLociIteratorSuite
     )
 
   test("no skips") {
-    strs.toSeq should ===(
+    ==(
+      strs.toSeq,
       List(
         10 → "a",
         11 → "b",
@@ -49,34 +50,35 @@ class SkippableLociIteratorSuite
   test("misc skips") {
     val it = strs
     it.skipTo(15)
-    it.next() should ===(20 → "c")
+    ==(it.next(), 20 → "c")
     it.skipTo(30)
-    it.next() should ===(30 → "e")
+    ==(it.next(), 30 → "e")
     intercept[IllegalArgumentException] {
       it.skipTo(30)
     }
-    it.next() should ===(31 → "f")
+    ==(it.next(), 31 → "f")
     it.skipTo(32)
-    it.next() should ===(33 → "g")
+    ==(it.next(), 33 → "g")
     it.skipTo(34)
-    it.next() should ===(34 → "h")
+    ==(it.next(), 34 → "h")
     it.skipTo(41)
-    it.next() should ===(50 → "j")
-    it.hasNext should ===(false)
+    ==(it.next(), 50 → "j")
+    ==(it.hasNext, false)
   }
 
   test("intersect") {
-    strs.intersect(
-      new LociIterator(
-        Iterator(
-          Interval( 8, 11),
-          Interval(14, 16),
-          Interval(30, 35),
-          Interval(38, 42),
-          Interval(50, 51)
-        ).buffered
-      )
-    ).toSeq ===
+    ==(
+      strs.intersect(
+        new LociIterator(
+          Iterator(
+            Interval( 8, 11),
+            Interval(14, 16),
+            Interval(30, 35),
+            Interval(38, 42),
+            Interval(50, 51)
+          ).buffered
+        )
+      ).toSeq,
       Seq(
         10 → "a",
         30 → "e",
@@ -86,6 +88,7 @@ class SkippableLociIteratorSuite
         40 → "i",
         50 → "j"
       )
+    )
   }
 }
 
