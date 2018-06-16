@@ -5,6 +5,7 @@ import org.hammerlab.genomics.loci.set.test.LociSetUtil
 import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.genomics.reference.test.{ ClearContigNames, ContigLengthsUtil, ContigNameConversions }
 import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Locus, NumLoci }
+import org.hammerlab.kryo.Registration.ClassWithSerializerToRegister
 import org.hammerlab.kryo._
 import org.hammerlab.spark.test.suite.KryoSparkSuite
 
@@ -26,6 +27,12 @@ class LociSetSuite
 
   def makeLociSet(str: String, lengths: (ContigName, NumLoci)*): LociSet =
     LociSet(ParsedLoci(str), lengths.toMap)
+
+  test("registration") {
+    val reg: ClassWithSerializerToRegister[LociSet] = arr[LociSet]
+    reg.serializer should be(Some(LociSet.serializer))
+    reg.alsoRegister should be(Some(LociSet.alsoRegister))
+  }
 
   test("properties of empty LociSet") {
     val empty = LociSet()

@@ -27,12 +27,12 @@ case class LociMap[T](@transient private val map: SortedMap[ContigName, Contig[T
   /** The number of loci in this LociMap. */
   @transient lazy val count: NumLoci = contigs.map(_.count).sum
 
-  /** The "inverse map", i.e. a T -> LociSet map that gives the loci that map to each value. */
+  /** The "inverse map", i.e. a T → LociSet map that gives the loci that map to each value. */
   @transient lazy val inverse: Map[T, LociSet] = {
     val mapOfBuilders = new mutable.HashMap[T, LociSetBuilder]()
     for {
-      contig <- contigs
-      (value, setContig) <- contig.inverse
+      contig ← contigs
+      (value, setContig) ← contig.inverse
     } {
       mapOfBuilders
         .getOrElseUpdate(value, new LociSetBuilder)
@@ -81,7 +81,7 @@ object LociMap {
   private[map] def apply[T](contigs: (ContigName, Locus, Locus, T)*): LociMap[T] = {
     val builder = new Builder[T]
     for {
-      (contig, start, end, value) <- contigs
+      (contig, start, end, value) ← contigs
     } {
       builder.put(contig, start, end, value)
     }
@@ -91,12 +91,13 @@ object LociMap {
   private[map] def fromContigs[T](contigs: Iterable[Contig[T]]): LociMap[T] =
     LociMap(
       TreeMap(
-        contigs.map(contig => contig.name -> contig).toSeq: _*
+        contigs.map(contig ⇒ contig.name → contig).toSeq: _*
       )
     )
 
-  import com.esotericsoftware.kryo
-  import org.hammerlab.kryo._
+  import org.hammerlab.kryo
   implicit val serializer: kryo.Serializer[LociMap[Nothing]] = new Serializer[Nothing]
+
+  import org.hammerlab.kryo._
   implicit val alsoRegister = AlsoRegister[LociMap[Nothing]](arr[Contig[Nothing]])
 }
