@@ -1,5 +1,6 @@
 subgroup("genomics", "loci")
-v"2.1.0"
+github.repo("genomic-loci")
+v"2.2.0"
 
 spark
 
@@ -10,9 +11,9 @@ dep(
         htsjdk,
      iterators % "2.2.0",
          paths % "1.5.0",
-     reference % "1.4.3" + testtest,
+     reference % "1.5.0" + testtest,
     scalautils,
-    spark_util % "2.0.4",
+    spark_util % "3.0.0",
   string_utils % "1.2.0"
 )
 
@@ -28,4 +29,3 @@ publishThinShadedJar
 
 publishTestJar
 
-github.repo("genomic-loci")

@@ -1,13 +1,13 @@
 package org.hammerlab.genomics.loci.set
 
+import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.{ Input, Output }
-import com.esotericsoftware.kryo.{ Kryo, Serializer }
 import htsjdk.samtools.util.{ Interval ⇒ HTSJDKInterval }
-import org.hammerlab.genomics.loci.parsing.{ All, Range, LociRanges, ParsedLoci }
+import org.hammerlab.genomics.loci.parsing.{ All, LociRanges, ParsedLoci, Range }
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigLengths, ContigName, Interval, Locus, NumLoci, Region }
+import org.hammerlab.kryo
 import org.hammerlab.strings.TruncatedToString
-import org.scalautils.ConversionCheckedTripleEquals._
 
 import scala.collection.SortedMap
 import scala.collection.immutable.TreeMap
@@ -82,8 +82,8 @@ case class LociSet(private val map: SortedMap[ContigName, Contig])
       }
 
       val (firstSet, secondSet) = (first.result, second.result)
-      assert(firstSet.count === numToTake)
-      assert(firstSet.count + secondSet.count === count)
+      ==(firstSet.count, numToTake)
+      ==(firstSet.count + secondSet.count, count)
       (firstSet, secondSet)
     }
   }
@@ -178,19 +178,17 @@ object LociSet {
       }
     )
 
-  // We just serialize the underlying contigs, which contain their names which are the string keys of LociSet.map.
-  implicit val serializer =
-    new Serializer[LociSet] {
-      def write(kryo: Kryo, output: Output, obj: LociSet) = {
-        kryo.writeObject(output, obj.contigs)
-      }
+  import org.hammerlab.kryo._
 
-      def read(kryo: Kryo, input: Input, klass: Class[LociSet]): LociSet = {
+  // We just serialize the underlying contigs, which contain their names which are the string keys of LociSet.map.
+  implicit val serializer: Serializer[LociSet] =
+    Serializer(
+      (kryo, input) ⇒ {
         val contigs = kryo.readObject(input, classOf[Array[Contig]])
         LociSet.fromContigs(contigs)
-      }
-    }
+      },
+      (kryo, out, obj) ⇒ kryo.writeObject(out, obj.contigs)
+    )
 
-  import org.hammerlab.kryo._
-  implicit val alsoRegister = AlsoRegister[LociSet](arr[Contig])
+  implicit val alsoRegister: AlsoRegister[LociSet] = AlsoRegister(arr[Contig])
 }

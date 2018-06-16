@@ -5,6 +5,7 @@ import com.google.common.collect.{ RangeSet, TreeRangeSet, Range ⇒ JRange }
 import org.hammerlab.genomics.loci.iterator.LociIterator
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigName, Interval, Locus, NumLoci, Region }
+import org.hammerlab.kryo
 import org.hammerlab.strings.TruncatedToString
 
 import scala.collection.JavaConverters._
@@ -115,6 +116,6 @@ object Contig {
   def lociRange(start: Locus, end: Locus): JRange[Locus] = closedOpen[Locus](start, end)
 
   import org.hammerlab.kryo._
-  implicit val serializer = new ContigSerializer
+  implicit val serializer: kryo.Serializer[Contig] = new ContigSerializer
   implicit val alsoRegister = AlsoRegister[Contig](cls[ContigName])
 }
